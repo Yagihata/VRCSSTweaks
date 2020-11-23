@@ -3,3 +3,7 @@
 ################################################################################
 
 /.vs
+/packages/MetroModernUI.1.4.0.0
+/VRCSSTweaks.sln
+/VRCSSTweaks/bin/Debug
+/VRCSSTweaks/obj
