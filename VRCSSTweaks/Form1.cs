@@ -15,6 +15,7 @@ using System.Windows.Forms;
 using System.Xml.Linq;
 using System.Xml.XPath;
 using ZXing;
+using Microsoft.WindowsAPICodePack.Dialogs;
 
 namespace VRCSSTweaks
 {
@@ -46,10 +47,20 @@ namespace VRCSSTweaks
             this.StyleManager = metroStyleManager1;
             resizeSuspendedComponents.Add(panelNewScreenshot);
             //Load Config XML
-            ssFolderPath.Text = LoadConfig();
+            LoadConfig();
             if (!Directory.Exists(ssFolderPath.Text))
                 ssFolderPath.Text = Environment.GetFolderPath(Environment.SpecialFolder.MyPictures) + "\\VRChat";
-
+            if (!Directory.Exists(ssFolderPath.Text))
+            {
+                MessageBox.Show("VRChatのスクリーンショットフォルダが見つかりません\nスクリーンショットのフォルダを選択して下さい");
+                using (var ofd = new CommonOpenFileDialog() { InitialDirectory = Environment.GetFolderPath(Environment.SpecialFolder.MyPictures), DefaultFileName = "VRChat", IsFolderPicker = true })
+                {
+                    if (ofd.ShowDialog() == CommonFileDialogResult.Ok)
+                    {
+                        ssFolderPath.Text = ofd.FileName;
+                    }
+                }
+            }
             var lastImage = Directory.GetFiles(ssFolderPath.Text, "*.png", SearchOption.TopDirectoryOnly)
                                     .OrderByDescending(n => File.GetLastWriteTime(n).Ticks).First();
             LoadRecentlyImage(lastImage);
@@ -121,35 +132,42 @@ namespace VRCSSTweaks
         {
             SaveConfig();
         }
-        private string LoadConfig()
+        private void LoadConfig()
         {
             var path = Directory.GetCurrentDirectory() + @"\config.xml";
             if (!File.Exists(path))
-                return "";
+                return;
             var xmlFile = XElement.Load(path);
             var vrcSSTSettings = xmlFile;
-            var ssDirectoryPath = vrcSSTSettings.Element("SSDirectoryPath");
-            return ssDirectoryPath.Value.ToString();
+            ssFolderPath.Text = vrcSSTSettings.Element("SSDirectoryPath").Value;
+            toggleObserveSS.Checked = Boolean.Parse(vrcSSTSettings.Element("ObserveScreenShot").Value);
+            toggleObserveRunningVRC.Checked = Boolean.Parse(vrcSSTSettings.Element("ObserveWithVRCRunning").Value);
+            toggleDetectBarcode.Checked = Boolean.Parse(vrcSSTSettings.Element("DetectBarcode").Value);
+            toggleOpenBarcode.Checked = Boolean.Parse(vrcSSTSettings.Element("AutoOpenBarcode").Value);
+            toggleSortSS.Checked = Boolean.Parse(vrcSSTSettings.Element("SortScreenShot").Value);
+            toggleStartup.Checked = Boolean.Parse(vrcSSTSettings.Element("StartupApp").Value);
         }
         private void SaveConfig()
         {
             var path = Directory.GetCurrentDirectory() + @"\config.xml";
             var xmlFile = new XElement("VRCSSTSettings");
             xmlFile.Add(new XElement("SSDirectoryPath", ssFolderPath.Text));
+            xmlFile.Add(new XElement("ObserveScreenShot", toggleObserveSS.Checked));
+            xmlFile.Add(new XElement("ObserveWithVRCRunning", toggleObserveRunningVRC.Checked));
+            xmlFile.Add(new XElement("DetectBarcode", toggleDetectBarcode.Checked));
+            xmlFile.Add(new XElement("AutoOpenBarcode", toggleOpenBarcode.Checked));
+            xmlFile.Add(new XElement("SortScreenShot", toggleSortSS.Checked));
+            xmlFile.Add(new XElement("StartupApp", toggleStartup.Checked));
             xmlFile.Save(path);
             Console.WriteLine(path);
         }
 
         private void vrcsstMainWindow_ResizeBegin(object sender, EventArgs e)
         {
-            resizeSuspendedComponents.ForEach(n => n.SuspendLayout());
-            resizeSuspendedComponents.ForEach(n => BeginControlUpdate(n));
         }
 
         private void vrcsstMainWindow_ResizeEnd(object sender, EventArgs e)
         {
-            resizeSuspendedComponents.ForEach(n => EndControlUpdate(n));
-            resizeSuspendedComponents.ForEach(n => n.ResumeLayout());
         }
         private void LoadRecentlyImage(string path)
         {
@@ -195,6 +213,19 @@ namespace VRCSSTweaks
                 / Math.Pow(2, 10), rounding).ToString() + " KB"; //kilobyte
 
             return amt.ToString() + " Bytes"; //byte
+        }
+
+        private void ssFolderSelectButton_Click(object sender, EventArgs e)
+        {
+            using (var ofd = new CommonOpenFileDialog() { DefaultDirectory = ssFolderPath.Text, IsFolderPicker = true })
+            {
+                if (ofd.ShowDialog() == CommonFileDialogResult.Ok)
+                {
+                    ssFolderPath.Text = ofd.FileName;
+                    var lastImage = Directory.GetFiles(ssFolderPath.Text, "*.png", SearchOption.TopDirectoryOnly).OrderByDescending(n => File.GetLastWriteTime(n).Ticks).First();
+                    LoadRecentlyImage(lastImage);
+                }
+            }
         }
     }
 }

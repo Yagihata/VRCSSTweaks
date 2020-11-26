@@ -30,14 +30,31 @@
         {
             this.components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(vrcsstMainWindow));
-            System.Windows.Forms.ListViewItem listViewItem7 = new System.Windows.Forms.ListViewItem("タグ１");
-            System.Windows.Forms.ListViewItem listViewItem8 = new System.Windows.Forms.ListViewItem("✓　タグ２");
-            System.Windows.Forms.ListViewItem listViewItem9 = new System.Windows.Forms.ListViewItem("タグ３");
+            System.Windows.Forms.ListViewItem listViewItem1 = new System.Windows.Forms.ListViewItem("タグ１");
+            System.Windows.Forms.ListViewItem listViewItem2 = new System.Windows.Forms.ListViewItem("✓　タグ２");
+            System.Windows.Forms.ListViewItem listViewItem3 = new System.Windows.Forms.ListViewItem("タグ３");
             this.notifyIcon1 = new System.Windows.Forms.NotifyIcon(this.components);
             this.contextMenuStrip1 = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.metroStyleManager1 = new MetroFramework.Components.MetroStyleManager(this.components);
             this.windowTabControl = new MetroFramework.Controls.MetroTabControl();
             this.tabMain = new MetroFramework.Controls.MetroTabPage();
+            this.metroListView1 = new MetroFramework.Controls.MetroListView();
+            this.metroButton2 = new MetroFramework.Controls.MetroButton();
+            this.metroButton1 = new MetroFramework.Controls.MetroButton();
+            this.textBoxRecentlySSURL = new MetroFramework.Controls.MetroTextBox();
+            this.metroLabel19 = new MetroFramework.Controls.MetroLabel();
+            this.metroLabel18 = new MetroFramework.Controls.MetroLabel();
+            this.labelRecentlySSSize = new MetroFramework.Controls.MetroLabel();
+            this.labelRecentlySSDate = new MetroFramework.Controls.MetroLabel();
+            this.labelRecentlySSName = new MetroFramework.Controls.MetroLabel();
+            this.metroLabel14 = new MetroFramework.Controls.MetroLabel();
+            this.metroLabel13 = new MetroFramework.Controls.MetroLabel();
+            this.metroLabel12 = new MetroFramework.Controls.MetroLabel();
+            this.metroLabel11 = new MetroFramework.Controls.MetroLabel();
+            this.metroLabel10 = new MetroFramework.Controls.MetroLabel();
+            this.metroLabel9 = new MetroFramework.Controls.MetroLabel();
+            this.metroLabel8 = new MetroFramework.Controls.MetroLabel();
+            this.panelNewScreenshot = new VRCSSTweaks.DoubleBufferedMetroPanel();
             this.tabScreenshots = new MetroFramework.Controls.MetroTabPage();
             this.tab2DBarcode = new MetroFramework.Controls.MetroTabPage();
             this.tabSettings = new MetroFramework.Controls.MetroTabPage();
@@ -59,23 +76,6 @@
             this.metroPanel3 = new MetroFramework.Controls.MetroPanel();
             this.toggleOpenBarcode = new MetroFramework.Controls.MetroToggle();
             this.metroLabel7 = new MetroFramework.Controls.MetroLabel();
-            this.panelNewScreenshot = new MetroFramework.Controls.MetroPanel();
-            this.metroLabel8 = new MetroFramework.Controls.MetroLabel();
-            this.metroLabel9 = new MetroFramework.Controls.MetroLabel();
-            this.metroLabel10 = new MetroFramework.Controls.MetroLabel();
-            this.metroLabel11 = new MetroFramework.Controls.MetroLabel();
-            this.metroLabel12 = new MetroFramework.Controls.MetroLabel();
-            this.metroLabel13 = new MetroFramework.Controls.MetroLabel();
-            this.metroLabel14 = new MetroFramework.Controls.MetroLabel();
-            this.labelRecentlySSName = new MetroFramework.Controls.MetroLabel();
-            this.labelRecentlySSDate = new MetroFramework.Controls.MetroLabel();
-            this.labelRecentlySSSize = new MetroFramework.Controls.MetroLabel();
-            this.metroLabel18 = new MetroFramework.Controls.MetroLabel();
-            this.metroLabel19 = new MetroFramework.Controls.MetroLabel();
-            this.textBoxRecentlySSURL = new MetroFramework.Controls.MetroTextBox();
-            this.metroButton1 = new MetroFramework.Controls.MetroButton();
-            this.metroButton2 = new MetroFramework.Controls.MetroButton();
-            this.metroListView1 = new MetroFramework.Controls.MetroListView();
             ((System.ComponentModel.ISupportInitialize)(this.metroStyleManager1)).BeginInit();
             this.windowTabControl.SuspendLayout();
             this.tabMain.SuspendLayout();
@@ -95,6 +95,7 @@
             // 
             // contextMenuStrip1
             // 
+            this.contextMenuStrip1.ImageScalingSize = new System.Drawing.Size(32, 32);
             this.contextMenuStrip1.Name = "contextMenuStrip1";
             this.contextMenuStrip1.Size = new System.Drawing.Size(61, 4);
             // 
@@ -114,7 +115,7 @@
             this.windowTabControl.Controls.Add(this.tabSettings);
             this.windowTabControl.Location = new System.Drawing.Point(23, 63);
             this.windowTabControl.Name = "windowTabControl";
-            this.windowTabControl.SelectedIndex = 0;
+            this.windowTabControl.SelectedIndex = 3;
             this.windowTabControl.Size = new System.Drawing.Size(757, 477);
             this.windowTabControl.TabIndex = 3;
             this.windowTabControl.UseSelectable = true;
@@ -150,6 +151,213 @@
             this.tabMain.VerticalScrollbarHighlightOnWheel = false;
             this.tabMain.VerticalScrollbarSize = 10;
             // 
+            // metroListView1
+            // 
+            this.metroListView1.Font = new System.Drawing.Font("Segoe UI", 12F);
+            this.metroListView1.FullRowSelect = true;
+            this.metroListView1.Items.AddRange(new System.Windows.Forms.ListViewItem[] {
+            listViewItem1,
+            listViewItem2,
+            listViewItem3});
+            this.metroListView1.Location = new System.Drawing.Point(590, 22);
+            this.metroListView1.Name = "metroListView1";
+            this.metroListView1.OwnerDraw = true;
+            this.metroListView1.Size = new System.Drawing.Size(156, 326);
+            this.metroListView1.TabIndex = 18;
+            this.metroListView1.UseCompatibleStateImageBehavior = false;
+            this.metroListView1.UseSelectable = true;
+            this.metroListView1.View = System.Windows.Forms.View.List;
+            // 
+            // metroButton2
+            // 
+            this.metroButton2.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.metroButton2.Location = new System.Drawing.Point(671, 412);
+            this.metroButton2.Name = "metroButton2";
+            this.metroButton2.Size = new System.Drawing.Size(75, 23);
+            this.metroButton2.TabIndex = 17;
+            this.metroButton2.Text = "開く";
+            this.metroButton2.UseSelectable = true;
+            // 
+            // metroButton1
+            // 
+            this.metroButton1.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.metroButton1.Location = new System.Drawing.Point(590, 412);
+            this.metroButton1.Name = "metroButton1";
+            this.metroButton1.Size = new System.Drawing.Size(75, 23);
+            this.metroButton1.TabIndex = 16;
+            this.metroButton1.Text = "コピー";
+            this.metroButton1.UseSelectable = true;
+            // 
+            // textBoxRecentlySSURL
+            // 
+            this.textBoxRecentlySSURL.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            // 
+            // 
+            // 
+            this.textBoxRecentlySSURL.CustomButton.Image = null;
+            this.textBoxRecentlySSURL.CustomButton.Location = new System.Drawing.Point(445, 1);
+            this.textBoxRecentlySSURL.CustomButton.Name = "";
+            this.textBoxRecentlySSURL.CustomButton.Size = new System.Drawing.Size(21, 21);
+            this.textBoxRecentlySSURL.CustomButton.Style = MetroFramework.MetroColorStyle.Blue;
+            this.textBoxRecentlySSURL.CustomButton.TabIndex = 1;
+            this.textBoxRecentlySSURL.CustomButton.Theme = MetroFramework.MetroThemeStyle.Light;
+            this.textBoxRecentlySSURL.CustomButton.UseSelectable = true;
+            this.textBoxRecentlySSURL.CustomButton.Visible = false;
+            this.textBoxRecentlySSURL.Lines = new string[] {
+        "metroTextBox1"};
+            this.textBoxRecentlySSURL.Location = new System.Drawing.Point(117, 411);
+            this.textBoxRecentlySSURL.MaxLength = 32767;
+            this.textBoxRecentlySSURL.Name = "textBoxRecentlySSURL";
+            this.textBoxRecentlySSURL.PasswordChar = '\0';
+            this.textBoxRecentlySSURL.ScrollBars = System.Windows.Forms.ScrollBars.None;
+            this.textBoxRecentlySSURL.SelectedText = "";
+            this.textBoxRecentlySSURL.SelectionLength = 0;
+            this.textBoxRecentlySSURL.SelectionStart = 0;
+            this.textBoxRecentlySSURL.ShortcutsEnabled = true;
+            this.textBoxRecentlySSURL.Size = new System.Drawing.Size(467, 23);
+            this.textBoxRecentlySSURL.TabIndex = 15;
+            this.textBoxRecentlySSURL.Text = "metroTextBox1";
+            this.textBoxRecentlySSURL.UseSelectable = true;
+            this.textBoxRecentlySSURL.WaterMarkColor = System.Drawing.Color.FromArgb(((int)(((byte)(109)))), ((int)(((byte)(109)))), ((int)(((byte)(109)))));
+            this.textBoxRecentlySSURL.WaterMarkFont = new System.Drawing.Font("Segoe UI", 12F, System.Drawing.FontStyle.Italic, System.Drawing.GraphicsUnit.Pixel);
+            // 
+            // metroLabel19
+            // 
+            this.metroLabel19.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.metroLabel19.AutoSize = true;
+            this.metroLabel19.Location = new System.Drawing.Point(88, 411);
+            this.metroLabel19.Name = "metroLabel19";
+            this.metroLabel19.Size = new System.Drawing.Size(23, 19);
+            this.metroLabel19.TabIndex = 14;
+            this.metroLabel19.Text = "：";
+            // 
+            // metroLabel18
+            // 
+            this.metroLabel18.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.metroLabel18.AutoSize = true;
+            this.metroLabel18.Location = new System.Drawing.Point(3, 411);
+            this.metroLabel18.Name = "metroLabel18";
+            this.metroLabel18.Size = new System.Drawing.Size(60, 19);
+            this.metroLabel18.TabIndex = 13;
+            this.metroLabel18.Text = "検出URL";
+            // 
+            // labelRecentlySSSize
+            // 
+            this.labelRecentlySSSize.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.labelRecentlySSSize.AutoSize = true;
+            this.labelRecentlySSSize.Location = new System.Drawing.Point(117, 389);
+            this.labelRecentlySSSize.Name = "labelRecentlySSSize";
+            this.labelRecentlySSSize.Size = new System.Drawing.Size(102, 19);
+            this.labelRecentlySSSize.TabIndex = 12;
+            this.labelRecentlySSSize.Text = "デフォルトテキスト";
+            // 
+            // labelRecentlySSDate
+            // 
+            this.labelRecentlySSDate.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.labelRecentlySSDate.AutoSize = true;
+            this.labelRecentlySSDate.Location = new System.Drawing.Point(117, 370);
+            this.labelRecentlySSDate.Name = "labelRecentlySSDate";
+            this.labelRecentlySSDate.Size = new System.Drawing.Size(102, 19);
+            this.labelRecentlySSDate.TabIndex = 11;
+            this.labelRecentlySSDate.Text = "デフォルトテキスト";
+            // 
+            // labelRecentlySSName
+            // 
+            this.labelRecentlySSName.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.labelRecentlySSName.AutoSize = true;
+            this.labelRecentlySSName.Location = new System.Drawing.Point(117, 351);
+            this.labelRecentlySSName.Name = "labelRecentlySSName";
+            this.labelRecentlySSName.Size = new System.Drawing.Size(102, 19);
+            this.labelRecentlySSName.TabIndex = 10;
+            this.labelRecentlySSName.Text = "デフォルトテキスト";
+            // 
+            // metroLabel14
+            // 
+            this.metroLabel14.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.metroLabel14.AutoSize = true;
+            this.metroLabel14.Location = new System.Drawing.Point(88, 351);
+            this.metroLabel14.Name = "metroLabel14";
+            this.metroLabel14.Size = new System.Drawing.Size(23, 19);
+            this.metroLabel14.TabIndex = 9;
+            this.metroLabel14.Text = "：";
+            // 
+            // metroLabel13
+            // 
+            this.metroLabel13.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.metroLabel13.AutoSize = true;
+            this.metroLabel13.Location = new System.Drawing.Point(88, 370);
+            this.metroLabel13.Name = "metroLabel13";
+            this.metroLabel13.Size = new System.Drawing.Size(23, 19);
+            this.metroLabel13.TabIndex = 8;
+            this.metroLabel13.Text = "：";
+            // 
+            // metroLabel12
+            // 
+            this.metroLabel12.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.metroLabel12.AutoSize = true;
+            this.metroLabel12.Location = new System.Drawing.Point(88, 389);
+            this.metroLabel12.Name = "metroLabel12";
+            this.metroLabel12.Size = new System.Drawing.Size(23, 19);
+            this.metroLabel12.TabIndex = 7;
+            this.metroLabel12.Text = "：";
+            // 
+            // metroLabel11
+            // 
+            this.metroLabel11.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.metroLabel11.AutoSize = true;
+            this.metroLabel11.Location = new System.Drawing.Point(3, 389);
+            this.metroLabel11.Name = "metroLabel11";
+            this.metroLabel11.Size = new System.Drawing.Size(79, 19);
+            this.metroLabel11.TabIndex = 6;
+            this.metroLabel11.Text = "ファイルサイズ";
+            // 
+            // metroLabel10
+            // 
+            this.metroLabel10.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.metroLabel10.AutoSize = true;
+            this.metroLabel10.Location = new System.Drawing.Point(3, 370);
+            this.metroLabel10.Name = "metroLabel10";
+            this.metroLabel10.Size = new System.Drawing.Size(65, 19);
+            this.metroLabel10.TabIndex = 5;
+            this.metroLabel10.Text = "撮影日時";
+            // 
+            // metroLabel9
+            // 
+            this.metroLabel9.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.metroLabel9.AutoSize = true;
+            this.metroLabel9.Location = new System.Drawing.Point(3, 351);
+            this.metroLabel9.Name = "metroLabel9";
+            this.metroLabel9.Size = new System.Drawing.Size(61, 19);
+            this.metroLabel9.TabIndex = 4;
+            this.metroLabel9.Text = "ファイル名";
+            // 
+            // metroLabel8
+            // 
+            this.metroLabel8.AutoSize = true;
+            this.metroLabel8.Location = new System.Drawing.Point(3, 0);
+            this.metroLabel8.Name = "metroLabel8";
+            this.metroLabel8.Size = new System.Drawing.Size(134, 19);
+            this.metroLabel8.TabIndex = 3;
+            this.metroLabel8.Text = "最新のスクリーンショット";
+            // 
+            // panelNewScreenshot
+            // 
+            this.panelNewScreenshot.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.panelNewScreenshot.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Zoom;
+            this.panelNewScreenshot.HorizontalScrollbarBarColor = true;
+            this.panelNewScreenshot.HorizontalScrollbarHighlightOnWheel = false;
+            this.panelNewScreenshot.HorizontalScrollbarSize = 10;
+            this.panelNewScreenshot.Location = new System.Drawing.Point(3, 22);
+            this.panelNewScreenshot.Name = "panelNewScreenshot";
+            this.panelNewScreenshot.Size = new System.Drawing.Size(581, 326);
+            this.panelNewScreenshot.TabIndex = 2;
+            this.panelNewScreenshot.VerticalScrollbarBarColor = true;
+            this.panelNewScreenshot.VerticalScrollbarHighlightOnWheel = false;
+            this.panelNewScreenshot.VerticalScrollbarSize = 10;
+            // 
             // tabScreenshots
             // 
             this.tabScreenshots.HorizontalScrollbarBarColor = true;
@@ -157,7 +365,7 @@
             this.tabScreenshots.HorizontalScrollbarSize = 10;
             this.tabScreenshots.Location = new System.Drawing.Point(4, 38);
             this.tabScreenshots.Name = "tabScreenshots";
-            this.tabScreenshots.Size = new System.Drawing.Size(746, 322);
+            this.tabScreenshots.Size = new System.Drawing.Size(749, 435);
             this.tabScreenshots.TabIndex = 2;
             this.tabScreenshots.Text = "スクリーンショット";
             this.tabScreenshots.VerticalScrollbarBarColor = true;
@@ -171,7 +379,7 @@
             this.tab2DBarcode.HorizontalScrollbarSize = 10;
             this.tab2DBarcode.Location = new System.Drawing.Point(4, 38);
             this.tab2DBarcode.Name = "tab2DBarcode";
-            this.tab2DBarcode.Size = new System.Drawing.Size(746, 322);
+            this.tab2DBarcode.Size = new System.Drawing.Size(749, 435);
             this.tab2DBarcode.TabIndex = 3;
             this.tab2DBarcode.Text = "バーコード";
             this.tab2DBarcode.VerticalScrollbarBarColor = true;
@@ -294,6 +502,7 @@
             this.ssFolderSelectButton.TabIndex = 4;
             this.ssFolderSelectButton.Text = "...";
             this.ssFolderSelectButton.UseSelectable = true;
+            this.ssFolderSelectButton.Click += new System.EventHandler(this.ssFolderSelectButton_Click);
             // 
             // ssFolderPath
             // 
@@ -439,213 +648,6 @@
             this.metroLabel7.TabIndex = 16;
             this.metroLabel7.Text = "2次元バーコード検出時に自動で開く";
             // 
-            // panelNewScreenshot
-            // 
-            this.panelNewScreenshot.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.panelNewScreenshot.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Zoom;
-            this.panelNewScreenshot.HorizontalScrollbarBarColor = true;
-            this.panelNewScreenshot.HorizontalScrollbarHighlightOnWheel = false;
-            this.panelNewScreenshot.HorizontalScrollbarSize = 10;
-            this.panelNewScreenshot.Location = new System.Drawing.Point(3, 22);
-            this.panelNewScreenshot.Name = "panelNewScreenshot";
-            this.panelNewScreenshot.Size = new System.Drawing.Size(581, 326);
-            this.panelNewScreenshot.TabIndex = 2;
-            this.panelNewScreenshot.VerticalScrollbarBarColor = true;
-            this.panelNewScreenshot.VerticalScrollbarHighlightOnWheel = false;
-            this.panelNewScreenshot.VerticalScrollbarSize = 10;
-            // 
-            // metroLabel8
-            // 
-            this.metroLabel8.AutoSize = true;
-            this.metroLabel8.Location = new System.Drawing.Point(3, 0);
-            this.metroLabel8.Name = "metroLabel8";
-            this.metroLabel8.Size = new System.Drawing.Size(134, 19);
-            this.metroLabel8.TabIndex = 3;
-            this.metroLabel8.Text = "最新のスクリーンショット";
-            // 
-            // metroLabel9
-            // 
-            this.metroLabel9.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.metroLabel9.AutoSize = true;
-            this.metroLabel9.Location = new System.Drawing.Point(3, 351);
-            this.metroLabel9.Name = "metroLabel9";
-            this.metroLabel9.Size = new System.Drawing.Size(61, 19);
-            this.metroLabel9.TabIndex = 4;
-            this.metroLabel9.Text = "ファイル名";
-            // 
-            // metroLabel10
-            // 
-            this.metroLabel10.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.metroLabel10.AutoSize = true;
-            this.metroLabel10.Location = new System.Drawing.Point(3, 370);
-            this.metroLabel10.Name = "metroLabel10";
-            this.metroLabel10.Size = new System.Drawing.Size(65, 19);
-            this.metroLabel10.TabIndex = 5;
-            this.metroLabel10.Text = "撮影日時";
-            // 
-            // metroLabel11
-            // 
-            this.metroLabel11.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.metroLabel11.AutoSize = true;
-            this.metroLabel11.Location = new System.Drawing.Point(3, 389);
-            this.metroLabel11.Name = "metroLabel11";
-            this.metroLabel11.Size = new System.Drawing.Size(79, 19);
-            this.metroLabel11.TabIndex = 6;
-            this.metroLabel11.Text = "ファイルサイズ";
-            // 
-            // metroLabel12
-            // 
-            this.metroLabel12.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.metroLabel12.AutoSize = true;
-            this.metroLabel12.Location = new System.Drawing.Point(88, 389);
-            this.metroLabel12.Name = "metroLabel12";
-            this.metroLabel12.Size = new System.Drawing.Size(23, 19);
-            this.metroLabel12.TabIndex = 7;
-            this.metroLabel12.Text = "：";
-            // 
-            // metroLabel13
-            // 
-            this.metroLabel13.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.metroLabel13.AutoSize = true;
-            this.metroLabel13.Location = new System.Drawing.Point(88, 370);
-            this.metroLabel13.Name = "metroLabel13";
-            this.metroLabel13.Size = new System.Drawing.Size(23, 19);
-            this.metroLabel13.TabIndex = 8;
-            this.metroLabel13.Text = "：";
-            // 
-            // metroLabel14
-            // 
-            this.metroLabel14.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.metroLabel14.AutoSize = true;
-            this.metroLabel14.Location = new System.Drawing.Point(88, 351);
-            this.metroLabel14.Name = "metroLabel14";
-            this.metroLabel14.Size = new System.Drawing.Size(23, 19);
-            this.metroLabel14.TabIndex = 9;
-            this.metroLabel14.Text = "：";
-            // 
-            // labelRecentlySSName
-            // 
-            this.labelRecentlySSName.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.labelRecentlySSName.AutoSize = true;
-            this.labelRecentlySSName.Location = new System.Drawing.Point(117, 351);
-            this.labelRecentlySSName.Name = "labelRecentlySSName";
-            this.labelRecentlySSName.Size = new System.Drawing.Size(102, 19);
-            this.labelRecentlySSName.TabIndex = 10;
-            this.labelRecentlySSName.Text = "デフォルトテキスト";
-            // 
-            // labelRecentlySSDate
-            // 
-            this.labelRecentlySSDate.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.labelRecentlySSDate.AutoSize = true;
-            this.labelRecentlySSDate.Location = new System.Drawing.Point(117, 370);
-            this.labelRecentlySSDate.Name = "labelRecentlySSDate";
-            this.labelRecentlySSDate.Size = new System.Drawing.Size(102, 19);
-            this.labelRecentlySSDate.TabIndex = 11;
-            this.labelRecentlySSDate.Text = "デフォルトテキスト";
-            // 
-            // labelRecentlySSSize
-            // 
-            this.labelRecentlySSSize.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.labelRecentlySSSize.AutoSize = true;
-            this.labelRecentlySSSize.Location = new System.Drawing.Point(117, 389);
-            this.labelRecentlySSSize.Name = "labelRecentlySSSize";
-            this.labelRecentlySSSize.Size = new System.Drawing.Size(102, 19);
-            this.labelRecentlySSSize.TabIndex = 12;
-            this.labelRecentlySSSize.Text = "デフォルトテキスト";
-            // 
-            // metroLabel18
-            // 
-            this.metroLabel18.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.metroLabel18.AutoSize = true;
-            this.metroLabel18.Location = new System.Drawing.Point(3, 411);
-            this.metroLabel18.Name = "metroLabel18";
-            this.metroLabel18.Size = new System.Drawing.Size(60, 19);
-            this.metroLabel18.TabIndex = 13;
-            this.metroLabel18.Text = "検出URL";
-            // 
-            // metroLabel19
-            // 
-            this.metroLabel19.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.metroLabel19.AutoSize = true;
-            this.metroLabel19.Location = new System.Drawing.Point(88, 411);
-            this.metroLabel19.Name = "metroLabel19";
-            this.metroLabel19.Size = new System.Drawing.Size(23, 19);
-            this.metroLabel19.TabIndex = 14;
-            this.metroLabel19.Text = "：";
-            // 
-            // textBoxRecentlySSURL
-            // 
-            this.textBoxRecentlySSURL.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            // 
-            // 
-            // 
-            this.textBoxRecentlySSURL.CustomButton.Image = null;
-            this.textBoxRecentlySSURL.CustomButton.Location = new System.Drawing.Point(445, 1);
-            this.textBoxRecentlySSURL.CustomButton.Name = "";
-            this.textBoxRecentlySSURL.CustomButton.Size = new System.Drawing.Size(21, 21);
-            this.textBoxRecentlySSURL.CustomButton.Style = MetroFramework.MetroColorStyle.Blue;
-            this.textBoxRecentlySSURL.CustomButton.TabIndex = 1;
-            this.textBoxRecentlySSURL.CustomButton.Theme = MetroFramework.MetroThemeStyle.Light;
-            this.textBoxRecentlySSURL.CustomButton.UseSelectable = true;
-            this.textBoxRecentlySSURL.CustomButton.Visible = false;
-            this.textBoxRecentlySSURL.Lines = new string[] {
-        "metroTextBox1"};
-            this.textBoxRecentlySSURL.Location = new System.Drawing.Point(117, 411);
-            this.textBoxRecentlySSURL.MaxLength = 32767;
-            this.textBoxRecentlySSURL.Name = "textBoxRecentlySSURL";
-            this.textBoxRecentlySSURL.PasswordChar = '\0';
-            this.textBoxRecentlySSURL.ScrollBars = System.Windows.Forms.ScrollBars.None;
-            this.textBoxRecentlySSURL.SelectedText = "";
-            this.textBoxRecentlySSURL.SelectionLength = 0;
-            this.textBoxRecentlySSURL.SelectionStart = 0;
-            this.textBoxRecentlySSURL.ShortcutsEnabled = true;
-            this.textBoxRecentlySSURL.Size = new System.Drawing.Size(467, 23);
-            this.textBoxRecentlySSURL.TabIndex = 15;
-            this.textBoxRecentlySSURL.Text = "metroTextBox1";
-            this.textBoxRecentlySSURL.UseSelectable = true;
-            this.textBoxRecentlySSURL.WaterMarkColor = System.Drawing.Color.FromArgb(((int)(((byte)(109)))), ((int)(((byte)(109)))), ((int)(((byte)(109)))));
-            this.textBoxRecentlySSURL.WaterMarkFont = new System.Drawing.Font("Segoe UI", 12F, System.Drawing.FontStyle.Italic, System.Drawing.GraphicsUnit.Pixel);
-            // 
-            // metroButton1
-            // 
-            this.metroButton1.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.metroButton1.Location = new System.Drawing.Point(590, 412);
-            this.metroButton1.Name = "metroButton1";
-            this.metroButton1.Size = new System.Drawing.Size(75, 23);
-            this.metroButton1.TabIndex = 16;
-            this.metroButton1.Text = "コピー";
-            this.metroButton1.UseSelectable = true;
-            // 
-            // metroButton2
-            // 
-            this.metroButton2.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.metroButton2.Location = new System.Drawing.Point(671, 412);
-            this.metroButton2.Name = "metroButton2";
-            this.metroButton2.Size = new System.Drawing.Size(75, 23);
-            this.metroButton2.TabIndex = 17;
-            this.metroButton2.Text = "開く";
-            this.metroButton2.UseSelectable = true;
-            // 
-            // metroListView1
-            // 
-            this.metroListView1.Font = new System.Drawing.Font("Segoe UI", 12F);
-            this.metroListView1.FullRowSelect = true;
-            this.metroListView1.Items.AddRange(new System.Windows.Forms.ListViewItem[] {
-            listViewItem7,
-            listViewItem8,
-            listViewItem9});
-            this.metroListView1.Location = new System.Drawing.Point(590, 22);
-            this.metroListView1.Name = "metroListView1";
-            this.metroListView1.OwnerDraw = true;
-            this.metroListView1.Size = new System.Drawing.Size(156, 326);
-            this.metroListView1.TabIndex = 18;
-            this.metroListView1.UseCompatibleStateImageBehavior = false;
-            this.metroListView1.UseSelectable = true;
-            this.metroListView1.View = System.Windows.Forms.View.List;
-            // 
             // vrcsstMainWindow
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
@@ -702,7 +704,7 @@
         private MetroFramework.Controls.MetroToggle toggleDetectBarcode;
         private MetroFramework.Controls.MetroTabPage tabScreenshots;
         private MetroFramework.Controls.MetroTabPage tab2DBarcode;
-        private MetroFramework.Controls.MetroPanel panelNewScreenshot;
+        private DoubleBufferedMetroPanel panelNewScreenshot;
         private MetroFramework.Controls.MetroLabel metroLabel8;
         private MetroFramework.Controls.MetroButton metroButton2;
         private MetroFramework.Controls.MetroButton metroButton1;
