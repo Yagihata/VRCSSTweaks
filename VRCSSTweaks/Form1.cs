@@ -16,6 +16,9 @@ using System.Xml.Linq;
 using System.Xml.XPath;
 using ZXing;
 using Microsoft.WindowsAPICodePack.Dialogs;
+using System.Diagnostics;
+using System.Text.RegularExpressions;
+using Microsoft.Win32;
 
 namespace VRCSSTweaks
 {
@@ -63,7 +66,7 @@ namespace VRCSSTweaks
             }
             var lastImage = Directory.GetFiles(ssFolderPath.Text, "*.png", SearchOption.TopDirectoryOnly)
                                     .OrderByDescending(n => File.GetLastWriteTime(n).Ticks).First();
-            LoadRecentlyImage(lastImage);
+            LoadRecentlyImage(lastImage, false);
 
 
             if (fileSystemWatcher != null) return;
@@ -85,18 +88,15 @@ namespace VRCSSTweaks
             fileSystemWatcher.Deleted += new FileSystemEventHandler(fileSystemWatcher_Changed);
 
             //監視を開始する
-            fileSystemWatcher.EnableRaisingEvents = true;
-            Console.WriteLine("監視を開始しました。");
-            if (toggleObserveSS.Checked)
-            {
-
-            }
+            fileSystemWatcher.EnableRaisingEvents = toggleObserveSS.Checked;
         }
 
         private void fileSystemWatcher_Changed(object sender, FileSystemEventArgs e)
         {
-            Console.WriteLine(e.FullPath);
-            LoadRecentlyImage(e.FullPath);
+            if (CheckIsVRCRunning())
+            {
+                LoadRecentlyImage(e.FullPath);
+            }
         }
 
         private void Form1_Load(object sender, EventArgs e)
@@ -127,6 +127,7 @@ namespace VRCSSTweaks
         private void toggleObserveSS_CheckedChanged(object sender, EventArgs e)
         {
             metroPanel2.Enabled = (sender as MetroToggle).Checked;
+            fileSystemWatcher.EnableRaisingEvents = toggleObserveSS.Checked;
         }
         private void vrcsstMainWindow_FormClosing(object sender, FormClosingEventArgs e)
         {
@@ -169,7 +170,7 @@ namespace VRCSSTweaks
         private void vrcsstMainWindow_ResizeEnd(object sender, EventArgs e)
         {
         }
-        private void LoadRecentlyImage(string path)
+        private void LoadRecentlyImage(string path, bool openBarcode = true)
         {
             var info = new FileInfo(path);
             labelRecentlySSName.Text = info.Name;
@@ -177,11 +178,18 @@ namespace VRCSSTweaks
             labelRecentlySSSize.Text = FormatSize(info.Length, 2).ToString();
             var file = Image.FromStream(info.OpenRead());
             panelNewScreenshot.BackgroundImage = file;
-            BarcodeReader reader = new BarcodeReader();
-            Result result = reader.Decode(file as Bitmap);
-            if (result != null)
+            if (toggleDetectBarcode.Checked)
             {
-                textBoxRecentlySSURL.Text = result.Text;
+                BarcodeReader reader = new BarcodeReader();
+                Result result = reader.Decode(file as Bitmap);
+                if (result != null)
+                {
+                    textBoxRecentlySSURL.Text = result.Text;
+                    if (toggleOpenBarcode.Checked && IsUrl(result.Text) && openBarcode)
+                        Process.Start(result.Text);
+                }
+                else
+                    textBoxRecentlySSURL.Text = "未検出";
             }
             else
                 textBoxRecentlySSURL.Text = "未検出";
@@ -214,7 +222,10 @@ namespace VRCSSTweaks
 
             return amt.ToString() + " Bytes"; //byte
         }
-
+        private bool CheckIsVRCRunning()
+        {
+            return Process.GetProcessesByName("vrchat.exe").Any();
+        }
         private void ssFolderSelectButton_Click(object sender, EventArgs e)
         {
             using (var ofd = new CommonOpenFileDialog() { DefaultDirectory = ssFolderPath.Text, IsFolderPicker = true })
@@ -225,6 +236,33 @@ namespace VRCSSTweaks
                     var lastImage = Directory.GetFiles(ssFolderPath.Text, "*.png", SearchOption.TopDirectoryOnly).OrderByDescending(n => File.GetLastWriteTime(n).Ticks).First();
                     LoadRecentlyImage(lastImage);
                 }
+            }
+        }
+        private bool IsUrl(string input)
+        {
+            if (string.IsNullOrEmpty(input))
+            {
+                return false;
+            }
+            return Regex.IsMatch(input, @"^s?https?://[-_.!~*'()a-zA-Z0-9;/?:@&=+$,%#]+$"
+            );
+        }
+
+        private void toggleStartup_CheckedChanged(object sender, EventArgs e)
+        {
+            if(toggleStartup.Checked)
+            {
+                RegistryKey regkey = Registry.CurrentUser.OpenSubKey(@"Software\Microsoft\Windows\CurrentVersion\Run", true);
+                regkey.SetValue(Application.ProductName, Application.ExecutablePath);
+                regkey.Close();
+            }
+            else
+            {
+                //Runキーを開く
+                RegistryKey regkey = Registry.CurrentUser.OpenSubKey(@"Software\Microsoft\Windows\CurrentVersion\Run", true);
+                regkey.DeleteValue(Application.ProductName);
+                //閉じる
+                regkey.Close();
             }
         }
     }

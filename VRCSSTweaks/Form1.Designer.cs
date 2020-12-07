@@ -440,6 +440,7 @@
             this.toggleStartup.TabIndex = 11;
             this.toggleStartup.Text = "Off";
             this.toggleStartup.UseSelectable = true;
+            this.toggleStartup.CheckedChanged += new System.EventHandler(this.toggleStartup_CheckedChanged);
             // 
             // toggleSortSS
             // 
