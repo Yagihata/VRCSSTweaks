@@ -17,32 +17,65 @@ namespace VRCSSTweaks
         {
             if (!toggleObserveRunningVRC.Checked || CheckIsVRCRunning())
             {
+                if(toggleSortSS.Checked)
+                {
+                    var path = e.FullPath;
+                    var info = new FileInfo(path);
+                    var date = info.CreationTime;
+                    var folderName = string.Format("{0}-{1:D2}-{2:D2}", date.Year, date.Month, date.Day);
+                    var directoryPath = ssFolderPath.Text + "\\" + folderName;
+                    var newPath = directoryPath + "\\" + Path.GetFileName(path);
+                    try
+                    {
+                        if (!Directory.Exists(directoryPath))
+                            Directory.CreateDirectory(directoryPath);
+                        File.Move(path, newPath);
+                        lastFilePath = newPath;
+                        LoadRecentlyImage(newPath);
+                        return;
+                    }
+                    catch
+                    {
+                    }
+                }
+                lastFilePath = e.FullPath;
                 LoadRecentlyImage(e.FullPath);
             }
         }
         private void LoadRecentlyImage(string path, bool openBarcode = true)
         {
-            var info = new FileInfo(path);
-            labelRecentlySSName.Text = info.Name;
-            labelRecentlySSDate.Text = info.LastWriteTime.ToString();
-            labelRecentlySSSize.Text = new FileSize(info).ToString();
-            var file = Image.FromStream(info.OpenRead());
-            panelNewScreenshot.BackgroundImage = file;
-            if (toggleDetectBarcode.Checked)
+            if (string.IsNullOrEmpty(path) || !File.Exists(path))
             {
-                BarcodeReader reader = new BarcodeReader();
-                Result result = reader.Decode(file as Bitmap);
-                if (result != null)
-                {
-                    textBoxRecentlySSURL.Text = result.Text;
-                    if (toggleOpenBarcode.Checked && IsUrl(result.Text) && openBarcode)
-                        Process.Start(result.Text);
-                }
-                else
-                    textBoxRecentlySSURL.Text = "未検出";
+                labelRecentlySSName.Text = "";
+                labelRecentlySSDate.Text = "";
+                labelRecentlySSSize.Text = "";
+                panelNewScreenshot.BackgroundImage = null;
+                textBoxRecentlySSURL.Text = "未検出";
             }
             else
-                textBoxRecentlySSURL.Text = "バーコード読み取り:無効";
+            {
+                var info = new FileInfo(path);
+                labelRecentlySSName.Text = info.Name;
+                labelRecentlySSDate.Text = info.LastWriteTime.ToString();
+                labelRecentlySSSize.Text = new FileSize(info).ToString();
+                var file = CreateImage(path);
+                panelNewScreenshot.BackgroundImage = file;
+                if (toggleDetectBarcode.Checked)
+                {
+                    BarcodeReader reader = new BarcodeReader();
+                    Result result = reader.Decode(file as Bitmap);
+                    if (result != null)
+                    {
+                        textBoxRecentlySSURL.Text = result.Text;
+                        if (toggleOpenBarcode.Checked && IsUrl(result.Text) && openBarcode)
+                            Process.Start(result.Text);
+                    }
+                    else
+                        textBoxRecentlySSURL.Text = "未検出";
+                }
+                else
+                    textBoxRecentlySSURL.Text = "バーコード読み取り:無効";
+            }
         }
         private void metroButton1_Click(object sender, EventArgs e)
         {

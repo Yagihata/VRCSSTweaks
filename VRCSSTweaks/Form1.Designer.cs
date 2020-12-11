@@ -120,6 +120,7 @@
             this.fileListRefresher = new System.ComponentModel.BackgroundWorker();
             this.metroContextMenu1 = new MetroFramework.Controls.MetroContextMenu(this.components);
             this.タグを削除ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.metroButton6 = new MetroFramework.Controls.MetroButton();
             ((System.ComponentModel.ISupportInitialize)(this.metroStyleManager1)).BeginInit();
             this.windowTabControl.SuspendLayout();
             this.tabMain.SuspendLayout();
@@ -884,6 +885,7 @@
             // 
             // metroGrid2
             // 
+            this.metroGrid2.AllowUserToAddRows = false;
             this.metroGrid2.AllowUserToResizeRows = false;
             this.metroGrid2.BackgroundColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
             this.metroGrid2.BorderStyle = System.Windows.Forms.BorderStyle.None;
@@ -1054,6 +1056,7 @@
             this.toggleSortSS.TabIndex = 8;
             this.toggleSortSS.Text = "Off";
             this.toggleSortSS.UseSelectable = true;
+            this.toggleSortSS.CheckedChanged += new System.EventHandler(this.toggleSortSS_CheckedChanged);
             // 
             // toggleObserveSS
             // 
@@ -1269,11 +1272,22 @@
             this.タグを削除ToolStripMenuItem.Text = "タグを削除";
             this.タグを削除ToolStripMenuItem.Click += new System.EventHandler(this.タグを削除ToolStripMenuItem_Click);
             // 
+            // metroButton6
+            // 
+            this.metroButton6.Location = new System.Drawing.Point(802, 34);
+            this.metroButton6.Name = "metroButton6";
+            this.metroButton6.Size = new System.Drawing.Size(75, 23);
+            this.metroButton6.TabIndex = 4;
+            this.metroButton6.Text = "metroButton6";
+            this.metroButton6.UseSelectable = true;
+            this.metroButton6.Click += new System.EventHandler(this.metroButton6_Click);
+            // 
             // vrcsstMainWindow
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(900, 540);
+            this.Controls.Add(this.metroButton6);
             this.Controls.Add(this.windowTabControl);
             this.Name = "vrcsstMainWindow";
             this.Text = "VRCSSTweaks";
@@ -1393,6 +1407,7 @@
         private System.Windows.Forms.DataGridViewTextBoxColumn tagNameColumn;
         private System.Windows.Forms.DataGridViewCheckBoxColumn isCheckedColumn;
         private MetroFramework.Controls.MetroCheckBox metroCheckBox1;
+        private MetroFramework.Controls.MetroButton metroButton6;
     }
 }
 

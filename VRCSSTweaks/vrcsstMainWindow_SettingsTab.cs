@@ -54,5 +54,19 @@ namespace VRCSSTweaks
             metroPanel2.Enabled = (sender as MetroToggle).Checked;
             fileSystemWatcher.EnableRaisingEvents = toggleObserveSS.Checked;
         }
+
+        private void toggleSortSS_CheckedChanged(object sender, EventArgs e)
+        {
+            if (finishInit)
+            {
+                if (toggleSortSS.Checked)
+                {
+                    if (MessageBox.Show("既に存在するファイルを日付分けしますか？", "確認", MessageBoxButtons.YesNo) == DialogResult.Yes)
+                    {
+                        SortScreenshot();
+                    }
+                }
+            }
+        }
     }
 }

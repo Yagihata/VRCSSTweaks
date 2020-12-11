@@ -60,7 +60,7 @@ namespace VRCSSTweaks
                 labelPreviewSSSize.Text = new FileSize(info).ToString();
                 if (panelScreenshotPreview.BackgroundImage != null)
                     panelScreenshotPreview.BackgroundImage.Dispose();
-                var file = Image.FromStream(info.OpenRead());
+                var file = CreateImage(path);
                 panelScreenshotPreview.BackgroundImage = file;
                 if (toggleDetectBarcode.Checked)
                 {
@@ -95,7 +95,10 @@ namespace VRCSSTweaks
                     }
                 }
                 else
-                    rawFileItems.ForEach(v => fileItems.Add(v));
+                {
+                    foreach (var v in rawFileItems)
+                        fileItems.Add(v);
+                }
 
                 metroGrid1.Enabled = true;
                 metroGrid1.DataSource = fileItems;
@@ -157,7 +160,8 @@ namespace VRCSSTweaks
                 var sha256 = GetSHA256(path);
                 if (containTagList.ContainsKey(sha256))
                 {
-                    containTagList[sha256].ForEach(n => fileItem.AddTag(n));
+                    foreach (var v in containTagList[sha256])
+                        fileItem.AddTag(v);
                 }
                 rawFileItems.Add(fileItem);
             }
@@ -335,8 +339,10 @@ namespace VRCSSTweaks
             var rowIndex = metroGrid2.Rows.IndexOf(metroGrid2.SelectedRows[0]);
             var name = tagItems[rowIndex].Name;
             tagItems.RemoveAt(rowIndex);
-            containTagList.Values.ToList().ForEach(n => n.Remove(name));
-            rawFileItems.ToList().ForEach(n => n.RemoveTag(name));
+            foreach (var v in containTagList.Values)
+                v.Remove(name);
+            foreach (var v in rawFileItems)
+                v.RemoveTag(name);
             PoseFileList();
             UpdateFileList();
             ((CurrencyManager)metroGrid2.BindingContext[tagItems]).Refresh();

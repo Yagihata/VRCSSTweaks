@@ -46,6 +46,8 @@ namespace VRCSSTweaks
         private BindingSource fileListBindingSource = new BindingSource();
         private BindingSource tagListBindingSource = new BindingSource();
         private BindingSource tagSelectorBindingSource = new BindingSource();
+        private bool finishInit = false;
+        private string lastFilePath = "";
         public vrcsstMainWindow()
         {
             InitializeComponent();
@@ -65,8 +67,6 @@ namespace VRCSSTweaks
                     }
                 }
             }
-            var lastImage = Directory.GetFiles(ssFolderPath.Text, "*.png", SearchOption.TopDirectoryOnly)
-                                    .OrderByDescending(n => File.GetLastWriteTime(n).Ticks).First();
 
 
             if (fileSystemWatcher != null) return;
@@ -101,14 +101,25 @@ namespace VRCSSTweaks
             tagSelectorBindingSource.DataSource = tagItems;
             metroComboBox2.DataSource = tagSelectorBindingSource;
             currentDirectory = ssFolderPath.Text;
-            fileListRefresher.RunWorkerAsync();
-            LoadRecentlyImage(lastImage, false);
+            LoadRecentlyImage(null, false);
             LoadPreviewImage(null);
+            finishInit = true;
         }
-
+        public Image CreateImage(string filename)
+        {
+            if (string.IsNullOrEmpty(filename) || !File.Exists(filename))
+                return null;
+            FileStream fs = new FileStream(filename, FileMode.Open, FileAccess.Read);
+            Image img = Image.FromStream(fs);
+            fs.Close();
+            return img;
+        }
         private void Form1_Load(object sender, EventArgs e)
         {
-
+            if (toggleSortSS.Checked)
+                SortScreenshot();
+            else
+                fileListRefresher.RunWorkerAsync();
         }
 
         private void Form1_Resize(object sender, EventArgs e)
@@ -169,7 +180,10 @@ namespace VRCSSTweaks
             var xmlFile = XElement.Load(path);
             foreach(var element in xmlFile.Elements())
             {
-                containTagList.Add(element.Name.LocalName.Replace("SHA256_", ""), element.Value.Split(',').ToList());
+                var tags = element.Value.Split(',').ToList();
+                foreach (var v in tags.Where(tagName => !tagItems.Any(tagItem => tagItem.Name == tagName)))
+                    tagItems.Add(new TagItem() { Name = v });
+                containTagList.Add(element.Name.LocalName.Replace("SHA256_", ""), tags);
             }
         }
         private void SaveTags()
@@ -226,6 +240,56 @@ namespace VRCSSTweaks
                 result = result + string.Format("{0:X2}", hash_sha256[i]);
             }
             return result;
+        }
+
+        private void SortScreenshot()
+        {
+            LoadPreviewImage(null);
+            LoadRecentlyImage(null);
+            var files = Directory.GetFiles(ssFolderPath.Text, "*.png");
+            var dialog = new ProgressWindow(metroStyleManager1);
+            dialog.Title = "スクリーンショット整理中...";
+            dialog.MaxValue = files.Length;
+            dialog.Owner = this;
+            dialog.Show();
+            Task.Factory.StartNew(() =>
+            {
+                toggleSortSS.Invoke((MethodInvoker)(() => toggleSortSS.Enabled = false));
+                foreach (var path in files)
+                {
+                    var info = new FileInfo(path);
+                    var date = info.CreationTime;
+                    var folderName = string.Format("{0}-{1:D2}-{2:D2}", date.Year, date.Month, date.Day);
+                    var directoryPath = ssFolderPath.Text + "\\" + folderName;
+                    try
+                    {
+                        if (!Directory.Exists(directoryPath))
+                            Directory.CreateDirectory(directoryPath);
+                        File.Move(path, directoryPath + "\\" + Path.GetFileName(path));
+                    }
+                    catch
+                    {
+                    }
+                    dialog.Invoke((MethodInvoker)(() => ++dialog.CurrentValue));
+                }
+                dialog.Invoke((MethodInvoker)(() => dialog.Close()));
+
+                if (!toggleSortSS.Enabled)
+                {
+                    toggleSortSS.Invoke((MethodInvoker)(() => toggleSortSS.Enabled = true));
+                }
+                this.Invoke((MethodInvoker)(() => { LoadRecentlyImage(lastFilePath); fileListRefresher.RunWorkerAsync(); }));
+                
+            });
+        }
+        private void metroButton6_Click(object sender, EventArgs e)
+        {
+            var files = Directory.GetFiles(ssFolderPath.Text, "*.png", SearchOption.AllDirectories);
+            foreach (var path in files)
+            {
+                if (Path.GetDirectoryName(path) != ssFolderPath.Text)
+                    File.Move(path, ssFolderPath.Text + "\\" + Path.GetFileName(path));
+            }
         }
     }
 }
