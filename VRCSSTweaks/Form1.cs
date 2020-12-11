@@ -19,6 +19,7 @@ using Microsoft.WindowsAPICodePack.Dialogs;
 using System.Diagnostics;
 using System.Text.RegularExpressions;
 using Microsoft.Win32;
+using System.Security.Cryptography;
 
 namespace VRCSSTweaks
 {
@@ -39,18 +40,18 @@ namespace VRCSSTweaks
             control.Invalidate();
         }
 
-        private List<Control> resizeSuspendedComponents = new List<Control>();
         private FileSystemWatcher fileSystemWatcher = null;
-
+        private Dictionary<string, List<string>> containTagList = new Dictionary<string, List<string>>();
+        private SortableBindingList<TagItem> tagItems = new SortableBindingList<TagItem>();
+        private BindingSource fileListBindingSource = new BindingSource();
+        private BindingSource tagListBindingSource = new BindingSource();
+        private BindingSource tagSelectorBindingSource = new BindingSource();
         public vrcsstMainWindow()
         {
             InitializeComponent();
             this.components.SetDefaultStyle(this, metroStyleManager1.Style);
             this.components.SetDefaultTheme(this, metroStyleManager1.Theme);
             this.StyleManager = metroStyleManager1;
-            resizeSuspendedComponents.Add(panelNewScreenshot);
-            //Load Config XML
-            LoadConfig();
             if (!Directory.Exists(ssFolderPath.Text))
                 ssFolderPath.Text = Environment.GetFolderPath(Environment.SpecialFolder.MyPictures) + "\\VRChat";
             if (!Directory.Exists(ssFolderPath.Text))
@@ -66,7 +67,6 @@ namespace VRCSSTweaks
             }
             var lastImage = Directory.GetFiles(ssFolderPath.Text, "*.png", SearchOption.TopDirectoryOnly)
                                     .OrderByDescending(n => File.GetLastWriteTime(n).Ticks).First();
-            LoadRecentlyImage(lastImage, false);
 
 
             if (fileSystemWatcher != null) return;
@@ -87,16 +87,23 @@ namespace VRCSSTweaks
             fileSystemWatcher.Created += new FileSystemEventHandler(fileSystemWatcher_Changed);
             fileSystemWatcher.Deleted += new FileSystemEventHandler(fileSystemWatcher_Changed);
 
+            //Load Config XML
+            LoadConfig();
+            LoadTags();
+
             //監視を開始する
             fileSystemWatcher.EnableRaisingEvents = toggleObserveSS.Checked;
-        }
-
-        private void fileSystemWatcher_Changed(object sender, FileSystemEventArgs e)
-        {
-            if (CheckIsVRCRunning())
-            {
-                LoadRecentlyImage(e.FullPath);
-            }
+            fileListBindingSource.DataSource = fileItems;
+            metroGrid1.DataSource = fileListBindingSource;
+            metroGrid2.AutoGenerateColumns = false;
+            tagListBindingSource.DataSource = tagItems;
+            metroGrid2.DataSource = tagListBindingSource;
+            tagSelectorBindingSource.DataSource = tagItems;
+            metroComboBox2.DataSource = tagSelectorBindingSource;
+            currentDirectory = ssFolderPath.Text;
+            fileListRefresher.RunWorkerAsync();
+            LoadRecentlyImage(lastImage, false);
+            LoadPreviewImage(null);
         }
 
         private void Form1_Load(object sender, EventArgs e)
@@ -118,20 +125,10 @@ namespace VRCSSTweaks
             WindowState = FormWindowState.Normal;
             notifyIcon1.Visible = false;
         }
-
-        private void toggleDetectBarcode_CheckedChanged(object sender, EventArgs e)
-        {
-            metroPanel3.Enabled = (sender as MetroToggle).Checked;
-        }
-
-        private void toggleObserveSS_CheckedChanged(object sender, EventArgs e)
-        {
-            metroPanel2.Enabled = (sender as MetroToggle).Checked;
-            fileSystemWatcher.EnableRaisingEvents = toggleObserveSS.Checked;
-        }
         private void vrcsstMainWindow_FormClosing(object sender, FormClosingEventArgs e)
         {
             SaveConfig();
+            SaveTags();
         }
         private void LoadConfig()
         {
@@ -140,13 +137,15 @@ namespace VRCSSTweaks
                 return;
             var xmlFile = XElement.Load(path);
             var vrcSSTSettings = xmlFile;
-            ssFolderPath.Text = vrcSSTSettings.Element("SSDirectoryPath").Value;
-            toggleObserveSS.Checked = Boolean.Parse(vrcSSTSettings.Element("ObserveScreenShot").Value);
-            toggleObserveRunningVRC.Checked = Boolean.Parse(vrcSSTSettings.Element("ObserveWithVRCRunning").Value);
-            toggleDetectBarcode.Checked = Boolean.Parse(vrcSSTSettings.Element("DetectBarcode").Value);
-            toggleOpenBarcode.Checked = Boolean.Parse(vrcSSTSettings.Element("AutoOpenBarcode").Value);
-            toggleSortSS.Checked = Boolean.Parse(vrcSSTSettings.Element("SortScreenShot").Value);
-            toggleStartup.Checked = Boolean.Parse(vrcSSTSettings.Element("StartupApp").Value);
+
+            ssFolderPath.Text = (string)GetConfigValue(vrcSSTSettings, "SSDirectoryPath", ssFolderPath.Text, typeof(string));
+
+            toggleObserveSS.Checked = (bool)GetConfigValue(vrcSSTSettings, "ObserveScreenShot", toggleObserveSS.Checked, typeof(bool));
+            toggleObserveRunningVRC.Checked = (bool)GetConfigValue(vrcSSTSettings, "ObserveWithVRCRunning", toggleObserveRunningVRC.Checked, typeof(bool));
+            toggleDetectBarcode.Checked = (bool)GetConfigValue(vrcSSTSettings, "DetectBarcode", toggleDetectBarcode.Checked, typeof(bool));
+            toggleOpenBarcode.Checked = (bool)GetConfigValue(vrcSSTSettings, "AutoOpenBarcode", toggleOpenBarcode.Checked, typeof(bool));
+            toggleSortSS.Checked = (bool)GetConfigValue(vrcSSTSettings, "SortScreenShot", toggleSortSS.Checked, typeof(bool));
+            toggleStartup.Checked = (bool)GetConfigValue(vrcSSTSettings, "StartupApp", toggleStartup.Checked, typeof(bool));
         }
         private void SaveConfig()
         {
@@ -160,83 +159,32 @@ namespace VRCSSTweaks
             xmlFile.Add(new XElement("SortScreenShot", toggleSortSS.Checked));
             xmlFile.Add(new XElement("StartupApp", toggleStartup.Checked));
             xmlFile.Save(path);
-            Console.WriteLine(path);
         }
-
-        private void vrcsstMainWindow_ResizeBegin(object sender, EventArgs e)
+        private void LoadTags()
         {
-        }
-
-        private void vrcsstMainWindow_ResizeEnd(object sender, EventArgs e)
-        {
-        }
-        private void LoadRecentlyImage(string path, bool openBarcode = true)
-        {
-            var info = new FileInfo(path);
-            labelRecentlySSName.Text = info.Name;
-            labelRecentlySSDate.Text = info.LastWriteTime.ToString();
-            labelRecentlySSSize.Text = FormatSize(info.Length, 2).ToString();
-            var file = Image.FromStream(info.OpenRead());
-            panelNewScreenshot.BackgroundImage = file;
-            if (toggleDetectBarcode.Checked)
+            containTagList.Clear();
+            var path = Directory.GetCurrentDirectory() + @"\tags.xml";
+            if (!File.Exists(path))
+                return;
+            var xmlFile = XElement.Load(path);
+            foreach(var element in xmlFile.Elements())
             {
-                BarcodeReader reader = new BarcodeReader();
-                Result result = reader.Decode(file as Bitmap);
-                if (result != null)
-                {
-                    textBoxRecentlySSURL.Text = result.Text;
-                    if (toggleOpenBarcode.Checked && IsUrl(result.Text) && openBarcode)
-                        Process.Start(result.Text);
-                }
-                else
-                    textBoxRecentlySSURL.Text = "未検出";
+                containTagList.Add(element.Name.LocalName.Replace("SHA256_", ""), element.Value.Split(',').ToList());
             }
-            else
-                textBoxRecentlySSURL.Text = "未検出";
         }
-        public string FormatSize(long amt, int rounding)
+        private void SaveTags()
         {
-            /// <summary>
-            /// ByteをKB, MB, GB...のような他の形式に変換する
-            /// KB, MB, GB, TB, PB, EB, ZB or YB
-            /// 第１引数:long型
-            /// 第２引数：小数点第何位まで表示するか
-            /// </summary>
-
-            if (amt >= Math.Pow(2, 80)) return Math.Round(amt
-                / Math.Pow(2, 70), rounding).ToString() + " YB"; //yettabyte
-            if (amt >= Math.Pow(2, 70)) return Math.Round(amt
-                / Math.Pow(2, 70), rounding).ToString() + " ZB"; //zettabyte
-            if (amt >= Math.Pow(2, 60)) return Math.Round(amt
-                / Math.Pow(2, 60), rounding).ToString() + " EB"; //exabyte
-            if (amt >= Math.Pow(2, 50)) return Math.Round(amt
-                / Math.Pow(2, 50), rounding).ToString() + " PB"; //petabyte
-            if (amt >= Math.Pow(2, 40)) return Math.Round(amt
-                / Math.Pow(2, 40), rounding).ToString() + " TB"; //terabyte
-            if (amt >= Math.Pow(2, 30)) return Math.Round(amt
-                / Math.Pow(2, 30), rounding).ToString() + " GB"; //gigabyte
-            if (amt >= Math.Pow(2, 20)) return Math.Round(amt
-                / Math.Pow(2, 20), rounding).ToString() + " MB"; //megabyte
-            if (amt >= Math.Pow(2, 10)) return Math.Round(amt
-                / Math.Pow(2, 10), rounding).ToString() + " KB"; //kilobyte
-
-            return amt.ToString() + " Bytes"; //byte
+            var path = Directory.GetCurrentDirectory() + @"\tags.xml";
+            var xmlFile = new XElement("VRCSSTTags");
+            foreach (var tagData in containTagList)
+            {
+                xmlFile.Add(new XElement("SHA256_" + tagData.Key, string.Join(",", tagData.Value)));
+            }
+            xmlFile.Save(path);
         }
         private bool CheckIsVRCRunning()
         {
-            return Process.GetProcessesByName("vrchat.exe").Any();
-        }
-        private void ssFolderSelectButton_Click(object sender, EventArgs e)
-        {
-            using (var ofd = new CommonOpenFileDialog() { DefaultDirectory = ssFolderPath.Text, IsFolderPicker = true })
-            {
-                if (ofd.ShowDialog() == CommonFileDialogResult.Ok)
-                {
-                    ssFolderPath.Text = ofd.FileName;
-                    var lastImage = Directory.GetFiles(ssFolderPath.Text, "*.png", SearchOption.TopDirectoryOnly).OrderByDescending(n => File.GetLastWriteTime(n).Ticks).First();
-                    LoadRecentlyImage(lastImage);
-                }
-            }
+            return Process.GetProcessesByName("VRChat").Any();
         }
         private bool IsUrl(string input)
         {
@@ -247,23 +195,37 @@ namespace VRCSSTweaks
             return Regex.IsMatch(input, @"^s?https?://[-_.!~*'()a-zA-Z0-9;/?:@&=+$,%#]+$"
             );
         }
-
-        private void toggleStartup_CheckedChanged(object sender, EventArgs e)
+        private object GetConfigValue(XElement element, string key, object defaultValue, Type type)
         {
-            if(toggleStartup.Checked)
+            var converter = TypeDescriptor.GetConverter(type);
+            if (converter != null)
             {
-                RegistryKey regkey = Registry.CurrentUser.OpenSubKey(@"Software\Microsoft\Windows\CurrentVersion\Run", true);
-                regkey.SetValue(Application.ProductName, Application.ExecutablePath);
-                regkey.Close();
+                var input = element.Element(key);
+                if (input != null)
+                    try
+                    {
+                        return converter.ConvertFromString(input.Value);
+                    }
+                    catch
+                    {
+                        return defaultValue;
+                    }
             }
-            else
+            return defaultValue;
+        }
+        private string GetSHA256(string baseTxt)
+        {
+            byte[] input = Encoding.ASCII.GetBytes(baseTxt);
+            SHA256 sha = new SHA256CryptoServiceProvider();
+            byte[] hash_sha256 = sha.ComputeHash(input);
+
+            string result = "";
+
+            for (int i = 0; i < hash_sha256.Length; i++)
             {
-                //Runキーを開く
-                RegistryKey regkey = Registry.CurrentUser.OpenSubKey(@"Software\Microsoft\Windows\CurrentVersion\Run", true);
-                regkey.DeleteValue(Application.ProductName);
-                //閉じる
-                regkey.Close();
+                result = result + string.Format("{0:X2}", hash_sha256[i]);
             }
+            return result;
         }
     }
 }
