@@ -19,7 +19,7 @@ namespace VRCSSTweaks.Properties {
     // または Visual Studio のようなツールを使用して自動生成されました。
     // メンバーを追加または削除するには、.ResX ファイルを編集して、/str オプションと共に
     // ResGen を実行し直すか、または VS プロジェクトをビルドし直します。
-    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "15.0.0.0")]
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "16.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
     internal class Resources {
@@ -47,7 +47,7 @@ namespace VRCSSTweaks.Properties {
         }
         
         /// <summary>
-        ///   厳密に型指定されたこのリソース クラスを使用して、すべての検索リソースに対し、
+        ///   すべてについて、現在のスレッドの CurrentUICulture プロパティをオーバーライドします
         ///   現在のスレッドの CurrentUICulture プロパティをオーバーライドします。
         /// </summary>
         [global::System.ComponentModel.EditorBrowsableAttribute(global::System.ComponentModel.EditorBrowsableState.Advanced)]
@@ -57,6 +57,19 @@ namespace VRCSSTweaks.Properties {
             }
             set {
                 resourceCulture = value;
+            }
+        }
+        
+        /// <summary>
+        ///   &lt;?xml version=&quot;1.0&quot; encoding=&quot;utf-8&quot;?&gt;
+        ///&lt;VRCSSTKeys&gt;
+        ///  &lt;APIKey&gt;gzSwCe9YDjuUV3CezP4MZYnIi&lt;/SSDirectoryPath&gt;
+        ///  &lt;APISecret&gt;pUxEP7k1gHthxwkd4y25d99Fo4TdWh4g440kJS6La1V1E2YGnG&lt;/ObserveScreenShot&gt;
+        ///&lt;/VRCSSTKeys&gt; に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        internal static string keys {
+            get {
+                return ResourceManager.GetString("keys", resourceCulture);
             }
         }
     }

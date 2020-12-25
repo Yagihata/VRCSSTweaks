@@ -8,3 +8,8 @@
 /VRCSSTweaks/bin/Debug
 /VRCSSTweaks/obj
 /VRCSSTweaks/packages.config
+/VRCSSTweaks/bin/Release
+/VRCSSTweaks/Resources/keys.xml
+/icon.png
+/icon.psd
+/keys.xml
