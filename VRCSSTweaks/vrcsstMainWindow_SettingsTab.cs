@@ -35,13 +35,74 @@ namespace VRCSSTweaks
         }
         private void ssFolderSelectButton_Click(object sender, EventArgs e)
         {
-            using (var ofd = new CommonOpenFileDialog() { DefaultDirectory = ssFolderPath.Text, IsFolderPicker = true })
+            using (var ofd = new CommonOpenFileDialog() { DefaultDirectory = textBoxSSFolder.Text, IsFolderPicker = true })
             {
                 if (ofd.ShowDialog() == CommonFileDialogResult.Ok)
                 {
-                    ssFolderPath.Text = ofd.FileName;
-                    var lastImage = Directory.GetFiles(ssFolderPath.Text, "*.png", SearchOption.TopDirectoryOnly).OrderByDescending(n => File.GetLastWriteTime(n).Ticks).First();
+                    textBoxSSFolder.Text = ofd.FileName;
+                }
+            }
+        }
+
+        private void textBoxSSFolder_TextChanged(object sender, EventArgs e)
+        {
+            if (finishInit)
+            {
+                CheckSSFolderIsExist();
+                if (!IsSSFolderLinked())
+                    return;
+                fileSystemWatcher.Path = GetSSFolderPath();
+                currentDirectory = GetSSFolderPath();
+                if (MessageBox.Show("元フォルダ内のファイルをリンク先へ移動しますか？", "確認", MessageBoxButtons.YesNo) == DialogResult.Yes)
+                {
+                    var srcPath = Environment.GetFolderPath(Environment.SpecialFolder.MyPictures) + "\\VRChat";
+                    var destPath = textBoxSSFolder.Text;
+                    LoadPreviewImage(null);
+                    LoadRecentlyImage(null);
+                    var files = Directory.GetFiles(srcPath, "*.png", SearchOption.AllDirectories);
+                    var dialog = new ProgressWindow(metroStyleManager1);
+                    dialog.Title = "スクリーンショット移動中...";
+                    dialog.MaxValue = files.Length;
+                    dialog.Owner = this;
+                    dialog.Show();
+                    Task.Factory.StartNew(() =>
+                    {
+                        this.Invoke((MethodInvoker)(() =>
+                        {
+                            windowTabControl.Enabled = false;
+                        }));
+                        foreach (var path in files)
+                        {
+                            try
+                            {
+                                var folderName = Path.GetDirectoryName(path).Replace(srcPath, "");
+                                var directoryPath = GetSSFolderPath() + folderName;
+                                if (!Directory.Exists(directoryPath))
+                                    Directory.CreateDirectory(directoryPath);
+                                File.Move(path, directoryPath + "\\" + Path.GetFileName(path));
+                            }
+                            catch
+                            {
+                            }
+                            dialog.Invoke((MethodInvoker)(() => ++dialog.CurrentValue));
+                        }
+                        dialog.Invoke((MethodInvoker)(() => dialog.Close()));
+
+                        this.Invoke((MethodInvoker)(() =>
+                        {
+                            windowTabControl.Enabled = true;
+                            var lastImage = Directory.GetFiles(GetSSFolderPath(), "*.png", SearchOption.TopDirectoryOnly).OrderByDescending(n => File.GetLastWriteTime(n).Ticks).FirstOrDefault();
+                            LoadRecentlyImage(lastImage);
+                            fileListRefresher.RunWorkerAsync();
+                        }));
+
+                    });
+                }
+                else
+                {
+                    var lastImage = Directory.GetFiles(GetSSFolderPath(), "*.png", SearchOption.TopDirectoryOnly).OrderByDescending(n => File.GetLastWriteTime(n).Ticks).FirstOrDefault();
                     LoadRecentlyImage(lastImage);
+                    fileListRefresher.RunWorkerAsync();
                 }
             }
         }

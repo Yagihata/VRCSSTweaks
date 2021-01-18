@@ -203,7 +203,7 @@ namespace VRCSSTweaks
 
         private void fileListRefresher_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
-            if (currentDirectory != ssFolderPath.Text)
+            if (currentDirectory != GetSSFolderPath())
             {
                 var item = new FileItem() { Name = "...", Date = "", Size = new FileSize(-2) };
                 item.AddTag("Folder");
@@ -565,7 +565,7 @@ namespace VRCSSTweaks
                         if (withTags)
                             containTagList.Remove(sha);
                     }
-                    if (dest.Contains(ssFolderPath.Text))
+                    if (dest.Contains(GetSSFolderPath()))
                     {
                         var newSHA = GetSHA256(dest);
                         if (tagData != null)

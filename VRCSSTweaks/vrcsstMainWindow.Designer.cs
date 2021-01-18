@@ -130,6 +130,12 @@
             this.metroButton6 = new MetroFramework.Controls.MetroButton();
             this.tabSettings = new MetroFramework.Controls.MetroTabPage();
             this.metroPanel1 = new MetroFramework.Controls.MetroPanel();
+            this.comboBoxCloseButtonMode = new MetroFramework.Controls.MetroComboBox();
+            this.metroLabel44 = new MetroFramework.Controls.MetroLabel();
+            this.comboBoxMinButtonMode = new MetroFramework.Controls.MetroComboBox();
+            this.metroLabel43 = new MetroFramework.Controls.MetroLabel();
+            this.metroLabel42 = new MetroFramework.Controls.MetroLabel();
+            this.toggleStartWithMinimized = new MetroFramework.Controls.MetroToggle();
             this.metroLabel41 = new MetroFramework.Controls.MetroLabel();
             this.toggleUseDarkMode = new MetroFramework.Controls.MetroToggle();
             this.metroLabel39 = new MetroFramework.Controls.MetroLabel();
@@ -152,7 +158,7 @@
             this.metroLabel3 = new MetroFramework.Controls.MetroLabel();
             this.metroLabel2 = new MetroFramework.Controls.MetroLabel();
             this.ssFolderSelectButton = new MetroFramework.Controls.MetroButton();
-            this.ssFolderPath = new MetroFramework.Controls.MetroTextBox();
+            this.textBoxSSFolder = new MetroFramework.Controls.MetroTextBox();
             this.metroLabel1 = new MetroFramework.Controls.MetroLabel();
             this.metroPanel2 = new MetroFramework.Controls.MetroPanel();
             this.toggleNewSSToQueue = new MetroFramework.Controls.MetroToggle();
@@ -264,8 +270,8 @@
             this.windowTabControl.Controls.Add(this.metroTabPage1);
             this.windowTabControl.Location = new System.Drawing.Point(23, 63);
             this.windowTabControl.Name = "windowTabControl";
-            this.windowTabControl.SelectedIndex = 3;
-            this.windowTabControl.Size = new System.Drawing.Size(784, 514);
+            this.windowTabControl.SelectedIndex = 2;
+            this.windowTabControl.Size = new System.Drawing.Size(754, 514);
             this.windowTabControl.TabIndex = 3;
             this.windowTabControl.UseSelectable = true;
             this.windowTabControl.SelectedIndexChanged += new System.EventHandler(this.windowTabControl_SelectedIndexChanged);
@@ -297,7 +303,7 @@
             this.tabMain.HorizontalScrollbarSize = 10;
             this.tabMain.Location = new System.Drawing.Point(4, 38);
             this.tabMain.Name = "tabMain";
-            this.tabMain.Size = new System.Drawing.Size(776, 472);
+            this.tabMain.Size = new System.Drawing.Size(746, 472);
             this.tabMain.TabIndex = 0;
             this.tabMain.Text = "ホーム";
             this.tabMain.VerticalScrollbarBarColor = true;
@@ -308,7 +314,7 @@
             // 
             this.metroLabel21.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.metroLabel21.AutoSize = true;
-            this.metroLabel21.Location = new System.Drawing.Point(617, 0);
+            this.metroLabel21.Location = new System.Drawing.Point(587, 0);
             this.metroLabel21.Name = "metroLabel21";
             this.metroLabel21.Size = new System.Drawing.Size(30, 19);
             this.metroLabel21.TabIndex = 33;
@@ -317,7 +323,7 @@
             // metroButton7
             // 
             this.metroButton7.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.metroButton7.Location = new System.Drawing.Point(750, 22);
+            this.metroButton7.Location = new System.Drawing.Point(720, 22);
             this.metroButton7.Name = "metroButton7";
             this.metroButton7.Size = new System.Drawing.Size(23, 23);
             this.metroButton7.TabIndex = 32;
@@ -341,7 +347,7 @@
             this.textBoxNSSTagName.CustomButton.UseSelectable = true;
             this.textBoxNSSTagName.CustomButton.Visible = false;
             this.textBoxNSSTagName.Lines = new string[0];
-            this.textBoxNSSTagName.Location = new System.Drawing.Point(617, 22);
+            this.textBoxNSSTagName.Location = new System.Drawing.Point(587, 22);
             this.textBoxNSSTagName.MaxLength = 32767;
             this.textBoxNSSTagName.Name = "textBoxNSSTagName";
             this.textBoxNSSTagName.PasswordChar = '\0';
@@ -365,7 +371,7 @@
             this.metroPanel7.HorizontalScrollbarBarColor = true;
             this.metroPanel7.HorizontalScrollbarHighlightOnWheel = false;
             this.metroPanel7.HorizontalScrollbarSize = 10;
-            this.metroPanel7.Location = new System.Drawing.Point(617, 51);
+            this.metroPanel7.Location = new System.Drawing.Point(587, 51);
             this.metroPanel7.Name = "metroPanel7";
             this.metroPanel7.Size = new System.Drawing.Size(156, 334);
             this.metroPanel7.TabIndex = 18;
@@ -450,7 +456,7 @@
             // metroButton2
             // 
             this.metroButton2.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.metroButton2.Location = new System.Drawing.Point(698, 446);
+            this.metroButton2.Location = new System.Drawing.Point(668, 446);
             this.metroButton2.Name = "metroButton2";
             this.metroButton2.Size = new System.Drawing.Size(75, 23);
             this.metroButton2.TabIndex = 17;
@@ -461,7 +467,7 @@
             // metroButton1
             // 
             this.metroButton1.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.metroButton1.Location = new System.Drawing.Point(617, 446);
+            this.metroButton1.Location = new System.Drawing.Point(587, 446);
             this.metroButton1.Name = "metroButton1";
             this.metroButton1.Size = new System.Drawing.Size(75, 23);
             this.metroButton1.TabIndex = 16;
@@ -477,7 +483,7 @@
             // 
             // 
             this.textBoxRecentlySSURL.CustomButton.Image = null;
-            this.textBoxRecentlySSURL.CustomButton.Location = new System.Drawing.Point(472, 1);
+            this.textBoxRecentlySSURL.CustomButton.Location = new System.Drawing.Point(442, 1);
             this.textBoxRecentlySSURL.CustomButton.Name = "";
             this.textBoxRecentlySSURL.CustomButton.Size = new System.Drawing.Size(21, 21);
             this.textBoxRecentlySSURL.CustomButton.Style = MetroFramework.MetroColorStyle.Blue;
@@ -496,7 +502,7 @@
             this.textBoxRecentlySSURL.SelectionLength = 0;
             this.textBoxRecentlySSURL.SelectionStart = 0;
             this.textBoxRecentlySSURL.ShortcutsEnabled = true;
-            this.textBoxRecentlySSURL.Size = new System.Drawing.Size(494, 23);
+            this.textBoxRecentlySSURL.Size = new System.Drawing.Size(464, 23);
             this.textBoxRecentlySSURL.TabIndex = 15;
             this.textBoxRecentlySSURL.Text = "metroTextBox1";
             this.textBoxRecentlySSURL.UseSelectable = true;
@@ -634,7 +640,7 @@
             this.panelNewScreenshot.HorizontalScrollbarSize = 10;
             this.panelNewScreenshot.Location = new System.Drawing.Point(3, 22);
             this.panelNewScreenshot.Name = "panelNewScreenshot";
-            this.panelNewScreenshot.Size = new System.Drawing.Size(608, 363);
+            this.panelNewScreenshot.Size = new System.Drawing.Size(578, 363);
             this.panelNewScreenshot.TabIndex = 2;
             this.panelNewScreenshot.VerticalScrollbarBarColor = true;
             this.panelNewScreenshot.VerticalScrollbarHighlightOnWheel = false;
@@ -648,7 +654,7 @@
             this.tabScreenshots.HorizontalScrollbarSize = 10;
             this.tabScreenshots.Location = new System.Drawing.Point(4, 38);
             this.tabScreenshots.Name = "tabScreenshots";
-            this.tabScreenshots.Size = new System.Drawing.Size(776, 472);
+            this.tabScreenshots.Size = new System.Drawing.Size(746, 472);
             this.tabScreenshots.TabIndex = 2;
             this.tabScreenshots.Text = "スクリーンショット";
             this.tabScreenshots.VerticalScrollbarBarColor = true;
@@ -673,8 +679,8 @@
             // 
             this.splitContainer1.Panel2.BackColor = System.Drawing.Color.Transparent;
             this.splitContainer1.Panel2.Controls.Add(this.metroPanel4);
-            this.splitContainer1.Size = new System.Drawing.Size(770, 466);
-            this.splitContainer1.SplitterDistance = 377;
+            this.splitContainer1.Size = new System.Drawing.Size(740, 466);
+            this.splitContainer1.SplitterDistance = 361;
             this.splitContainer1.TabIndex = 4;
             // 
             // metroPanel6
@@ -688,7 +694,7 @@
             this.metroPanel6.HorizontalScrollbarSize = 10;
             this.metroPanel6.Location = new System.Drawing.Point(0, 0);
             this.metroPanel6.Name = "metroPanel6";
-            this.metroPanel6.Size = new System.Drawing.Size(377, 466);
+            this.metroPanel6.Size = new System.Drawing.Size(361, 466);
             this.metroPanel6.TabIndex = 0;
             this.metroPanel6.VerticalScrollbarBarColor = true;
             this.metroPanel6.VerticalScrollbarHighlightOnWheel = false;
@@ -717,7 +723,7 @@
             this.metroComboBox2.ItemHeight = 23;
             this.metroComboBox2.Location = new System.Drawing.Point(104, 434);
             this.metroComboBox2.Name = "metroComboBox2";
-            this.metroComboBox2.Size = new System.Drawing.Size(270, 29);
+            this.metroComboBox2.Size = new System.Drawing.Size(254, 29);
             this.metroComboBox2.TabIndex = 8;
             this.metroComboBox2.UseSelectable = true;
             this.metroComboBox2.SelectedIndexChanged += new System.EventHandler(this.metroComboBox2_SelectedIndexChanged);
@@ -783,7 +789,7 @@
             this.metroGrid1.RowHeadersWidthSizeMode = System.Windows.Forms.DataGridViewRowHeadersWidthSizeMode.DisableResizing;
             this.metroGrid1.RowTemplate.Height = 21;
             this.metroGrid1.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
-            this.metroGrid1.Size = new System.Drawing.Size(377, 428);
+            this.metroGrid1.Size = new System.Drawing.Size(361, 428);
             this.metroGrid1.TabIndex = 2;
             this.metroGrid1.CellDoubleClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.metroGrid1_CellDoubleClick);
             this.metroGrid1.CellMouseClick += new System.Windows.Forms.DataGridViewCellMouseEventHandler(this.metroGrid1_CellMouseClick);
@@ -854,7 +860,7 @@
             this.metroPanel4.HorizontalScrollbarSize = 10;
             this.metroPanel4.Location = new System.Drawing.Point(0, 0);
             this.metroPanel4.Name = "metroPanel4";
-            this.metroPanel4.Size = new System.Drawing.Size(389, 466);
+            this.metroPanel4.Size = new System.Drawing.Size(375, 466);
             this.metroPanel4.TabIndex = 3;
             this.metroPanel4.VerticalScrollbarBarColor = true;
             this.metroPanel4.VerticalScrollbarHighlightOnWheel = false;
@@ -863,7 +869,7 @@
             // metroButton10
             // 
             this.metroButton10.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.metroButton10.Location = new System.Drawing.Point(250, 354);
+            this.metroButton10.Location = new System.Drawing.Point(236, 354);
             this.metroButton10.Name = "metroButton10";
             this.metroButton10.Size = new System.Drawing.Size(135, 23);
             this.metroButton10.TabIndex = 32;
@@ -874,7 +880,7 @@
             // metroButton5
             // 
             this.metroButton5.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.metroButton5.Location = new System.Drawing.Point(362, 22);
+            this.metroButton5.Location = new System.Drawing.Point(348, 22);
             this.metroButton5.Name = "metroButton5";
             this.metroButton5.Size = new System.Drawing.Size(23, 23);
             this.metroButton5.TabIndex = 31;
@@ -898,7 +904,7 @@
             this.textBoxPRSSAddTagName.CustomButton.UseSelectable = true;
             this.textBoxPRSSAddTagName.CustomButton.Visible = false;
             this.textBoxPRSSAddTagName.Lines = new string[0];
-            this.textBoxPRSSAddTagName.Location = new System.Drawing.Point(250, 22);
+            this.textBoxPRSSAddTagName.Location = new System.Drawing.Point(236, 22);
             this.textBoxPRSSAddTagName.MaxLength = 32767;
             this.textBoxPRSSAddTagName.Name = "textBoxPRSSAddTagName";
             this.textBoxPRSSAddTagName.PasswordChar = '\0';
@@ -925,7 +931,7 @@
             // metroButton3
             // 
             this.metroButton3.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.metroButton3.Location = new System.Drawing.Point(310, 440);
+            this.metroButton3.Location = new System.Drawing.Point(296, 440);
             this.metroButton3.Name = "metroButton3";
             this.metroButton3.Size = new System.Drawing.Size(75, 23);
             this.metroButton3.TabIndex = 29;
@@ -936,7 +942,7 @@
             // metroButton4
             // 
             this.metroButton4.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.metroButton4.Location = new System.Drawing.Point(229, 440);
+            this.metroButton4.Location = new System.Drawing.Point(215, 440);
             this.metroButton4.Name = "metroButton4";
             this.metroButton4.Size = new System.Drawing.Size(75, 23);
             this.metroButton4.TabIndex = 28;
@@ -952,7 +958,7 @@
             // 
             // 
             this.textBoxPreviewSSURL.CustomButton.Image = null;
-            this.textBoxPreviewSSURL.CustomButton.Location = new System.Drawing.Point(83, 1);
+            this.textBoxPreviewSSURL.CustomButton.Location = new System.Drawing.Point(81, 1);
             this.textBoxPreviewSSURL.CustomButton.Name = "";
             this.textBoxPreviewSSURL.CustomButton.Size = new System.Drawing.Size(21, 21);
             this.textBoxPreviewSSURL.CustomButton.Style = MetroFramework.MetroColorStyle.Blue;
@@ -972,7 +978,7 @@
             this.textBoxPreviewSSURL.SelectionLength = 0;
             this.textBoxPreviewSSURL.SelectionStart = 0;
             this.textBoxPreviewSSURL.ShortcutsEnabled = true;
-            this.textBoxPreviewSSURL.Size = new System.Drawing.Size(105, 23);
+            this.textBoxPreviewSSURL.Size = new System.Drawing.Size(103, 23);
             this.textBoxPreviewSSURL.TabIndex = 27;
             this.textBoxPreviewSSURL.Text = "metroTextBox1";
             this.textBoxPreviewSSURL.UseSelectable = true;
@@ -1093,7 +1099,7 @@
             // 
             this.metroLabel16.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.metroLabel16.AutoSize = true;
-            this.metroLabel16.Location = new System.Drawing.Point(250, 1);
+            this.metroLabel16.Location = new System.Drawing.Point(236, 1);
             this.metroLabel16.Name = "metroLabel16";
             this.metroLabel16.Size = new System.Drawing.Size(30, 19);
             this.metroLabel16.TabIndex = 6;
@@ -1108,7 +1114,7 @@
             this.metroPanel5.HorizontalScrollbarBarColor = true;
             this.metroPanel5.HorizontalScrollbarHighlightOnWheel = false;
             this.metroPanel5.HorizontalScrollbarSize = 10;
-            this.metroPanel5.Location = new System.Drawing.Point(250, 51);
+            this.metroPanel5.Location = new System.Drawing.Point(236, 51);
             this.metroPanel5.Name = "metroPanel5";
             this.metroPanel5.Size = new System.Drawing.Size(136, 297);
             this.metroPanel5.TabIndex = 5;
@@ -1201,7 +1207,7 @@
             this.panelScreenshotPreview.HorizontalScrollbarSize = 10;
             this.panelScreenshotPreview.Location = new System.Drawing.Point(3, 22);
             this.panelScreenshotPreview.Name = "panelScreenshotPreview";
-            this.panelScreenshotPreview.Size = new System.Drawing.Size(241, 355);
+            this.panelScreenshotPreview.Size = new System.Drawing.Size(227, 355);
             this.panelScreenshotPreview.TabIndex = 3;
             this.panelScreenshotPreview.VerticalScrollbarBarColor = true;
             this.panelScreenshotPreview.VerticalScrollbarHighlightOnWheel = false;
@@ -1218,7 +1224,7 @@
             this.tabTweet.HorizontalScrollbarSize = 10;
             this.tabTweet.Location = new System.Drawing.Point(4, 38);
             this.tabTweet.Name = "tabTweet";
-            this.tabTweet.Size = new System.Drawing.Size(776, 472);
+            this.tabTweet.Size = new System.Drawing.Size(746, 472);
             this.tabTweet.TabIndex = 4;
             this.tabTweet.Text = "ツイート";
             this.tabTweet.VerticalScrollbarBarColor = true;
@@ -1247,7 +1253,7 @@
             this.metroPanel8.HorizontalScrollbarSize = 10;
             this.metroPanel8.Location = new System.Drawing.Point(3, 32);
             this.metroPanel8.Name = "metroPanel8";
-            this.metroPanel8.Size = new System.Drawing.Size(770, 437);
+            this.metroPanel8.Size = new System.Drawing.Size(740, 437);
             this.metroPanel8.TabIndex = 5;
             this.metroPanel8.VerticalScrollbarBarColor = true;
             this.metroPanel8.VerticalScrollbarHighlightOnWheel = false;
@@ -1257,7 +1263,7 @@
             // 
             this.metroCheckBox2.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.metroCheckBox2.AutoSize = true;
-            this.metroCheckBox2.Location = new System.Drawing.Point(625, 390);
+            this.metroCheckBox2.Location = new System.Drawing.Point(595, 390);
             this.metroCheckBox2.Name = "metroCheckBox2";
             this.metroCheckBox2.Size = new System.Drawing.Size(141, 15);
             this.metroCheckBox2.TabIndex = 17;
@@ -1273,7 +1279,7 @@
             this.metroPanel9.HorizontalScrollbarBarColor = true;
             this.metroPanel9.HorizontalScrollbarHighlightOnWheel = false;
             this.metroPanel9.HorizontalScrollbarSize = 10;
-            this.metroPanel9.Location = new System.Drawing.Point(623, 51);
+            this.metroPanel9.Location = new System.Drawing.Point(593, 51);
             this.metroPanel9.Name = "metroPanel9";
             this.metroPanel9.Size = new System.Drawing.Size(144, 333);
             this.metroPanel9.TabIndex = 16;
@@ -1385,7 +1391,7 @@
             this.listViewTweetImage.Name = "listViewTweetImage";
             this.listViewTweetImage.PersistentCacheDirectory = "";
             this.listViewTweetImage.PersistentCacheSize = ((long)(100));
-            this.listViewTweetImage.Size = new System.Drawing.Size(447, 95);
+            this.listViewTweetImage.Size = new System.Drawing.Size(417, 95);
             this.listViewTweetImage.TabIndex = 13;
             this.listViewTweetImage.ThumbnailSize = new System.Drawing.Size(96, 54);
             this.listViewTweetImage.UseWIC = true;
@@ -1424,7 +1430,7 @@
             // metroButton9
             // 
             this.metroButton9.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.metroButton9.Location = new System.Drawing.Point(623, 411);
+            this.metroButton9.Location = new System.Drawing.Point(593, 411);
             this.metroButton9.Name = "metroButton9";
             this.metroButton9.Size = new System.Drawing.Size(144, 23);
             this.metroButton9.TabIndex = 10;
@@ -1436,7 +1442,7 @@
             // 
             this.metroButton8.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.metroButton8.FontWeight = MetroFramework.MetroButtonWeight.Regular;
-            this.metroButton8.Location = new System.Drawing.Point(744, 22);
+            this.metroButton8.Location = new System.Drawing.Point(714, 22);
             this.metroButton8.Name = "metroButton8";
             this.metroButton8.Size = new System.Drawing.Size(23, 23);
             this.metroButton8.TabIndex = 9;
@@ -1460,7 +1466,7 @@
             this.textBoxTweetHashtagName.CustomButton.UseSelectable = true;
             this.textBoxTweetHashtagName.CustomButton.Visible = false;
             this.textBoxTweetHashtagName.Lines = new string[0];
-            this.textBoxTweetHashtagName.Location = new System.Drawing.Point(623, 22);
+            this.textBoxTweetHashtagName.Location = new System.Drawing.Point(593, 22);
             this.textBoxTweetHashtagName.MaxLength = 32767;
             this.textBoxTweetHashtagName.Name = "textBoxTweetHashtagName";
             this.textBoxTweetHashtagName.PasswordChar = '\0';
@@ -1479,7 +1485,7 @@
             // 
             this.metroLabel31.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.metroLabel31.AutoSize = true;
-            this.metroLabel31.Location = new System.Drawing.Point(623, 0);
+            this.metroLabel31.Location = new System.Drawing.Point(593, 0);
             this.metroLabel31.Name = "metroLabel31";
             this.metroLabel31.Size = new System.Drawing.Size(98, 19);
             this.metroLabel31.TabIndex = 7;
@@ -1503,7 +1509,7 @@
             // 
             // 
             this.metroTextBox1.CustomButton.Image = null;
-            this.metroTextBox1.CustomButton.Location = new System.Drawing.Point(157, 2);
+            this.metroTextBox1.CustomButton.Location = new System.Drawing.Point(127, 2);
             this.metroTextBox1.CustomButton.Name = "";
             this.metroTextBox1.CustomButton.Size = new System.Drawing.Size(287, 287);
             this.metroTextBox1.CustomButton.Style = MetroFramework.MetroColorStyle.Blue;
@@ -1522,7 +1528,7 @@
             this.metroTextBox1.SelectionLength = 0;
             this.metroTextBox1.SelectionStart = 0;
             this.metroTextBox1.ShortcutsEnabled = true;
-            this.metroTextBox1.Size = new System.Drawing.Size(447, 292);
+            this.metroTextBox1.Size = new System.Drawing.Size(417, 292);
             this.metroTextBox1.TabIndex = 4;
             this.metroTextBox1.UseSelectable = true;
             this.metroTextBox1.WaterMarkColor = System.Drawing.Color.FromArgb(((int)(((byte)(109)))), ((int)(((byte)(109)))), ((int)(((byte)(109)))));
@@ -1573,7 +1579,7 @@
             this.tabSettings.HorizontalScrollbarSize = 10;
             this.tabSettings.Location = new System.Drawing.Point(4, 38);
             this.tabSettings.Name = "tabSettings";
-            this.tabSettings.Size = new System.Drawing.Size(776, 472);
+            this.tabSettings.Size = new System.Drawing.Size(746, 472);
             this.tabSettings.TabIndex = 1;
             this.tabSettings.Text = "設定";
             this.tabSettings.VerticalScrollbarBarColor = true;
@@ -1586,6 +1592,12 @@
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.metroPanel1.AutoScroll = true;
+            this.metroPanel1.Controls.Add(this.comboBoxCloseButtonMode);
+            this.metroPanel1.Controls.Add(this.metroLabel44);
+            this.metroPanel1.Controls.Add(this.comboBoxMinButtonMode);
+            this.metroPanel1.Controls.Add(this.metroLabel43);
+            this.metroPanel1.Controls.Add(this.metroLabel42);
+            this.metroPanel1.Controls.Add(this.toggleStartWithMinimized);
             this.metroPanel1.Controls.Add(this.metroLabel41);
             this.metroPanel1.Controls.Add(this.toggleUseDarkMode);
             this.metroPanel1.Controls.Add(this.metroLabel39);
@@ -1601,7 +1613,7 @@
             this.metroPanel1.Controls.Add(this.metroLabel3);
             this.metroPanel1.Controls.Add(this.metroLabel2);
             this.metroPanel1.Controls.Add(this.ssFolderSelectButton);
-            this.metroPanel1.Controls.Add(this.ssFolderPath);
+            this.metroPanel1.Controls.Add(this.textBoxSSFolder);
             this.metroPanel1.Controls.Add(this.metroLabel1);
             this.metroPanel1.Controls.Add(this.metroPanel2);
             this.metroPanel1.HorizontalScrollbar = true;
@@ -1610,12 +1622,81 @@
             this.metroPanel1.HorizontalScrollbarSize = 10;
             this.metroPanel1.Location = new System.Drawing.Point(3, 3);
             this.metroPanel1.Name = "metroPanel1";
-            this.metroPanel1.Size = new System.Drawing.Size(770, 466);
+            this.metroPanel1.Size = new System.Drawing.Size(740, 466);
             this.metroPanel1.TabIndex = 2;
             this.metroPanel1.VerticalScrollbar = true;
             this.metroPanel1.VerticalScrollbarBarColor = true;
             this.metroPanel1.VerticalScrollbarHighlightOnWheel = false;
             this.metroPanel1.VerticalScrollbarSize = 10;
+            // 
+            // comboBoxCloseButtonMode
+            // 
+            this.comboBoxCloseButtonMode.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.comboBoxCloseButtonMode.FormattingEnabled = true;
+            this.comboBoxCloseButtonMode.ItemHeight = 23;
+            this.comboBoxCloseButtonMode.Items.AddRange(new object[] {
+            "タスクトレイに格納",
+            "タスクバーに格納",
+            "アプリケーションを終了する（デフォルト）"});
+            this.comboBoxCloseButtonMode.Location = new System.Drawing.Point(363, 520);
+            this.comboBoxCloseButtonMode.Name = "comboBoxCloseButtonMode";
+            this.comboBoxCloseButtonMode.Size = new System.Drawing.Size(306, 29);
+            this.comboBoxCloseButtonMode.TabIndex = 38;
+            this.comboBoxCloseButtonMode.UseSelectable = true;
+            // 
+            // metroLabel44
+            // 
+            this.metroLabel44.AutoSize = true;
+            this.metroLabel44.Location = new System.Drawing.Point(3, 530);
+            this.metroLabel44.Name = "metroLabel44";
+            this.metroLabel44.Size = new System.Drawing.Size(114, 19);
+            this.metroLabel44.TabIndex = 37;
+            this.metroLabel44.Text = "閉じるボタンの動作";
+            // 
+            // comboBoxMinButtonMode
+            // 
+            this.comboBoxMinButtonMode.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.comboBoxMinButtonMode.FormattingEnabled = true;
+            this.comboBoxMinButtonMode.ItemHeight = 23;
+            this.comboBoxMinButtonMode.Items.AddRange(new object[] {
+            "タスクトレイに格納（デフォルト）",
+            "タスクバーに格納",
+            "アプリケーションを終了する"});
+            this.comboBoxMinButtonMode.Location = new System.Drawing.Point(363, 485);
+            this.comboBoxMinButtonMode.Name = "comboBoxMinButtonMode";
+            this.comboBoxMinButtonMode.Size = new System.Drawing.Size(306, 29);
+            this.comboBoxMinButtonMode.TabIndex = 36;
+            this.comboBoxMinButtonMode.UseSelectable = true;
+            // 
+            // metroLabel43
+            // 
+            this.metroLabel43.AutoSize = true;
+            this.metroLabel43.Location = new System.Drawing.Point(3, 495);
+            this.metroLabel43.Name = "metroLabel43";
+            this.metroLabel43.Size = new System.Drawing.Size(121, 19);
+            this.metroLabel43.TabIndex = 35;
+            this.metroLabel43.Text = "最小化ボタンの動作";
+            // 
+            // metroLabel42
+            // 
+            this.metroLabel42.AutoSize = true;
+            this.metroLabel42.Location = new System.Drawing.Point(3, 460);
+            this.metroLabel42.Name = "metroLabel42";
+            this.metroLabel42.Size = new System.Drawing.Size(127, 19);
+            this.metroLabel42.TabIndex = 34;
+            this.metroLabel42.Text = "起動時に最小化する";
+            // 
+            // toggleStartWithMinimized
+            // 
+            this.toggleStartWithMinimized.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.toggleStartWithMinimized.FontSize = MetroFramework.MetroLinkSize.Medium;
+            this.toggleStartWithMinimized.Location = new System.Drawing.Point(569, 456);
+            this.toggleStartWithMinimized.Name = "toggleStartWithMinimized";
+            this.toggleStartWithMinimized.Size = new System.Drawing.Size(97, 23);
+            this.toggleStartWithMinimized.Style = MetroFramework.MetroColorStyle.Black;
+            this.toggleStartWithMinimized.TabIndex = 33;
+            this.toggleStartWithMinimized.Text = "Off";
+            this.toggleStartWithMinimized.UseSelectable = true;
             // 
             // metroLabel41
             // 
@@ -1632,7 +1713,7 @@
             this.toggleUseDarkMode.Checked = true;
             this.toggleUseDarkMode.CheckState = System.Windows.Forms.CheckState.Checked;
             this.toggleUseDarkMode.FontSize = MetroFramework.MetroLinkSize.Medium;
-            this.toggleUseDarkMode.Location = new System.Drawing.Point(667, 287);
+            this.toggleUseDarkMode.Location = new System.Drawing.Point(569, 287);
             this.toggleUseDarkMode.Name = "toggleUseDarkMode";
             this.toggleUseDarkMode.Size = new System.Drawing.Size(97, 23);
             this.toggleUseDarkMode.Style = MetroFramework.MetroColorStyle.Black;
@@ -1646,7 +1727,7 @@
             this.metroLabel39.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.metroLabel39.AutoSize = true;
             this.metroLabel39.FontSize = MetroFramework.MetroLabelSize.Tall;
-            this.metroLabel39.Location = new System.Drawing.Point(733, 227);
+            this.metroLabel39.Location = new System.Drawing.Point(635, 227);
             this.metroLabel39.Name = "metroLabel39";
             this.metroLabel39.Size = new System.Drawing.Size(31, 25);
             this.metroLabel39.TabIndex = 30;
@@ -1670,7 +1751,7 @@
             this.textBoxBorderHour.FontSize = MetroFramework.MetroTextBoxSize.Tall;
             this.textBoxBorderHour.Lines = new string[] {
         "0"};
-            this.textBoxBorderHour.Location = new System.Drawing.Point(593, 223);
+            this.textBoxBorderHour.Location = new System.Drawing.Point(495, 223);
             this.textBoxBorderHour.MaxLength = 32767;
             this.textBoxBorderHour.Name = "textBoxBorderHour";
             this.textBoxBorderHour.PasswordChar = '\0';
@@ -1713,7 +1794,7 @@
             this.metroPanel10.HorizontalScrollbarSize = 10;
             this.metroPanel10.Location = new System.Drawing.Point(6, 342);
             this.metroPanel10.Name = "metroPanel10";
-            this.metroPanel10.Size = new System.Drawing.Size(764, 108);
+            this.metroPanel10.Size = new System.Drawing.Size(666, 108);
             this.metroPanel10.TabIndex = 20;
             this.metroPanel10.VerticalScrollbarBarColor = true;
             this.metroPanel10.VerticalScrollbarHighlightOnWheel = false;
@@ -1724,7 +1805,7 @@
             this.metroLabel37.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.metroLabel37.AutoSize = true;
             this.metroLabel37.FontSize = MetroFramework.MetroLabelSize.Tall;
-            this.metroLabel37.Location = new System.Drawing.Point(711, 80);
+            this.metroLabel37.Location = new System.Drawing.Point(613, 80);
             this.metroLabel37.Name = "metroLabel37";
             this.metroLabel37.Size = new System.Drawing.Size(50, 25);
             this.metroLabel37.TabIndex = 27;
@@ -1748,7 +1829,7 @@
             this.textBoxCompressDays.FontSize = MetroFramework.MetroTextBoxSize.Tall;
             this.textBoxCompressDays.Lines = new string[] {
         "30"};
-            this.textBoxCompressDays.Location = new System.Drawing.Point(590, 76);
+            this.textBoxCompressDays.Location = new System.Drawing.Point(492, 76);
             this.textBoxCompressDays.MaxLength = 32767;
             this.textBoxCompressDays.Name = "textBoxCompressDays";
             this.textBoxCompressDays.PasswordChar = '\0';
@@ -1800,7 +1881,7 @@
             "レベル７",
             "レベル８",
             "圧縮率重視（レベル９）"});
-            this.comboBoxCompressLevel.Location = new System.Drawing.Point(455, 38);
+            this.comboBoxCompressLevel.Location = new System.Drawing.Point(357, 38);
             this.comboBoxCompressLevel.Name = "comboBoxCompressLevel";
             this.comboBoxCompressLevel.Size = new System.Drawing.Size(306, 29);
             this.comboBoxCompressLevel.TabIndex = 23;
@@ -1815,7 +1896,7 @@
             "日付ごとにzipファイルを分ける",
             "月ごとにzipファイルを分ける",
             "すべてのファイルをまとめて圧縮"});
-            this.comboBoxCompressMethod.Location = new System.Drawing.Point(455, 3);
+            this.comboBoxCompressMethod.Location = new System.Drawing.Point(357, 3);
             this.comboBoxCompressMethod.Name = "comboBoxCompressMethod";
             this.comboBoxCompressMethod.Size = new System.Drawing.Size(306, 29);
             this.comboBoxCompressMethod.TabIndex = 22;
@@ -1843,7 +1924,7 @@
             // 
             this.toggleCompression.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.toggleCompression.FontSize = MetroFramework.MetroLinkSize.Medium;
-            this.toggleCompression.Location = new System.Drawing.Point(667, 316);
+            this.toggleCompression.Location = new System.Drawing.Point(569, 316);
             this.toggleCompression.Name = "toggleCompression";
             this.toggleCompression.Size = new System.Drawing.Size(97, 23);
             this.toggleCompression.Style = MetroFramework.MetroColorStyle.Black;
@@ -1856,7 +1937,7 @@
             // 
             this.toggleStartup.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.toggleStartup.FontSize = MetroFramework.MetroLinkSize.Medium;
-            this.toggleStartup.Location = new System.Drawing.Point(667, 258);
+            this.toggleStartup.Location = new System.Drawing.Point(569, 258);
             this.toggleStartup.Name = "toggleStartup";
             this.toggleStartup.Size = new System.Drawing.Size(97, 23);
             this.toggleStartup.Style = MetroFramework.MetroColorStyle.Black;
@@ -1869,7 +1950,7 @@
             // 
             this.toggleSortSS.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.toggleSortSS.FontSize = MetroFramework.MetroLinkSize.Medium;
-            this.toggleSortSS.Location = new System.Drawing.Point(667, 194);
+            this.toggleSortSS.Location = new System.Drawing.Point(569, 194);
             this.toggleSortSS.Name = "toggleSortSS";
             this.toggleSortSS.Size = new System.Drawing.Size(97, 23);
             this.toggleSortSS.Style = MetroFramework.MetroColorStyle.Black;
@@ -1884,7 +1965,7 @@
             this.toggleObserveSS.Checked = true;
             this.toggleObserveSS.CheckState = System.Windows.Forms.CheckState.Checked;
             this.toggleObserveSS.FontSize = MetroFramework.MetroLinkSize.Medium;
-            this.toggleObserveSS.Location = new System.Drawing.Point(667, 32);
+            this.toggleObserveSS.Location = new System.Drawing.Point(569, 32);
             this.toggleObserveSS.Name = "toggleObserveSS";
             this.toggleObserveSS.Size = new System.Drawing.Size(97, 23);
             this.toggleObserveSS.Style = MetroFramework.MetroColorStyle.Black;
@@ -1923,7 +2004,7 @@
             // ssFolderSelectButton
             // 
             this.ssFolderSelectButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.ssFolderSelectButton.Location = new System.Drawing.Point(741, 3);
+            this.ssFolderSelectButton.Location = new System.Drawing.Point(643, 3);
             this.ssFolderSelectButton.Name = "ssFolderSelectButton";
             this.ssFolderSelectButton.Size = new System.Drawing.Size(23, 23);
             this.ssFolderSelectButton.TabIndex = 4;
@@ -1931,48 +2012,47 @@
             this.ssFolderSelectButton.UseSelectable = true;
             this.ssFolderSelectButton.Click += new System.EventHandler(this.ssFolderSelectButton_Click);
             // 
-            // ssFolderPath
+            // textBoxSSFolder
             // 
-            this.ssFolderPath.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            this.textBoxSSFolder.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             // 
             // 
             // 
-            this.ssFolderPath.CustomButton.Image = null;
-            this.ssFolderPath.CustomButton.Location = new System.Drawing.Point(570, 1);
-            this.ssFolderPath.CustomButton.Name = "";
-            this.ssFolderPath.CustomButton.Size = new System.Drawing.Size(21, 21);
-            this.ssFolderPath.CustomButton.Style = MetroFramework.MetroColorStyle.Blue;
-            this.ssFolderPath.CustomButton.TabIndex = 1;
-            this.ssFolderPath.CustomButton.Theme = MetroFramework.MetroThemeStyle.Light;
-            this.ssFolderPath.CustomButton.UseSelectable = true;
-            this.ssFolderPath.CustomButton.Visible = false;
-            this.ssFolderPath.Lines = new string[] {
-        "metroTextBox1"};
-            this.ssFolderPath.Location = new System.Drawing.Point(143, 3);
-            this.ssFolderPath.MaxLength = 32767;
-            this.ssFolderPath.Name = "ssFolderPath";
-            this.ssFolderPath.PasswordChar = '\0';
-            this.ssFolderPath.ScrollBars = System.Windows.Forms.ScrollBars.None;
-            this.ssFolderPath.SelectedText = "";
-            this.ssFolderPath.SelectionLength = 0;
-            this.ssFolderPath.SelectionStart = 0;
-            this.ssFolderPath.ShortcutsEnabled = true;
-            this.ssFolderPath.Size = new System.Drawing.Size(592, 23);
-            this.ssFolderPath.TabIndex = 3;
-            this.ssFolderPath.Text = "metroTextBox1";
-            this.ssFolderPath.UseSelectable = true;
-            this.ssFolderPath.WaterMarkColor = System.Drawing.Color.FromArgb(((int)(((byte)(109)))), ((int)(((byte)(109)))), ((int)(((byte)(109)))));
-            this.ssFolderPath.WaterMarkFont = new System.Drawing.Font("Segoe UI", 12F, System.Drawing.FontStyle.Italic, System.Drawing.GraphicsUnit.Pixel);
+            this.textBoxSSFolder.CustomButton.Image = null;
+            this.textBoxSSFolder.CustomButton.Location = new System.Drawing.Point(419, 1);
+            this.textBoxSSFolder.CustomButton.Name = "";
+            this.textBoxSSFolder.CustomButton.Size = new System.Drawing.Size(21, 21);
+            this.textBoxSSFolder.CustomButton.Style = MetroFramework.MetroColorStyle.Blue;
+            this.textBoxSSFolder.CustomButton.TabIndex = 1;
+            this.textBoxSSFolder.CustomButton.Theme = MetroFramework.MetroThemeStyle.Light;
+            this.textBoxSSFolder.CustomButton.UseSelectable = true;
+            this.textBoxSSFolder.CustomButton.Visible = false;
+            this.textBoxSSFolder.Lines = new string[0];
+            this.textBoxSSFolder.Location = new System.Drawing.Point(196, 3);
+            this.textBoxSSFolder.MaxLength = 32767;
+            this.textBoxSSFolder.Name = "textBoxSSFolder";
+            this.textBoxSSFolder.PasswordChar = '\0';
+            this.textBoxSSFolder.ScrollBars = System.Windows.Forms.ScrollBars.None;
+            this.textBoxSSFolder.SelectedText = "";
+            this.textBoxSSFolder.SelectionLength = 0;
+            this.textBoxSSFolder.SelectionStart = 0;
+            this.textBoxSSFolder.ShortcutsEnabled = true;
+            this.textBoxSSFolder.Size = new System.Drawing.Size(441, 23);
+            this.textBoxSSFolder.TabIndex = 3;
+            this.textBoxSSFolder.UseSelectable = true;
+            this.textBoxSSFolder.WaterMarkColor = System.Drawing.Color.FromArgb(((int)(((byte)(109)))), ((int)(((byte)(109)))), ((int)(((byte)(109)))));
+            this.textBoxSSFolder.WaterMarkFont = new System.Drawing.Font("Segoe UI", 12F, System.Drawing.FontStyle.Italic, System.Drawing.GraphicsUnit.Pixel);
+            this.textBoxSSFolder.TextChanged += new System.EventHandler(this.textBoxSSFolder_TextChanged);
             // 
             // metroLabel1
             // 
             this.metroLabel1.AutoSize = true;
             this.metroLabel1.Location = new System.Drawing.Point(3, 7);
             this.metroLabel1.Name = "metroLabel1";
-            this.metroLabel1.Size = new System.Drawing.Size(134, 19);
+            this.metroLabel1.Size = new System.Drawing.Size(187, 19);
             this.metroLabel1.TabIndex = 2;
-            this.metroLabel1.Text = "スクリーンショットフォルダ";
+            this.metroLabel1.Text = "スクリーンショットフォルダのリンク先";
             // 
             // metroPanel2
             // 
@@ -1990,7 +2070,7 @@
             this.metroPanel2.HorizontalScrollbarSize = 10;
             this.metroPanel2.Location = new System.Drawing.Point(3, 61);
             this.metroPanel2.Name = "metroPanel2";
-            this.metroPanel2.Size = new System.Drawing.Size(764, 127);
+            this.metroPanel2.Size = new System.Drawing.Size(666, 127);
             this.metroPanel2.TabIndex = 17;
             this.metroPanel2.VerticalScrollbarBarColor = true;
             this.metroPanel2.VerticalScrollbarHighlightOnWheel = false;
@@ -2000,7 +2080,7 @@
             // 
             this.toggleNewSSToQueue.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.toggleNewSSToQueue.FontSize = MetroFramework.MetroLinkSize.Medium;
-            this.toggleNewSSToQueue.Location = new System.Drawing.Point(664, 33);
+            this.toggleNewSSToQueue.Location = new System.Drawing.Point(566, 33);
             this.toggleNewSSToQueue.Name = "toggleNewSSToQueue";
             this.toggleNewSSToQueue.Size = new System.Drawing.Size(97, 23);
             this.toggleNewSSToQueue.Style = MetroFramework.MetroColorStyle.Black;
@@ -2023,7 +2103,7 @@
             this.toggleObserveRunningVRC.Checked = true;
             this.toggleObserveRunningVRC.CheckState = System.Windows.Forms.CheckState.Checked;
             this.toggleObserveRunningVRC.FontSize = MetroFramework.MetroLinkSize.Medium;
-            this.toggleObserveRunningVRC.Location = new System.Drawing.Point(664, 4);
+            this.toggleObserveRunningVRC.Location = new System.Drawing.Point(566, 4);
             this.toggleObserveRunningVRC.Name = "toggleObserveRunningVRC";
             this.toggleObserveRunningVRC.Size = new System.Drawing.Size(97, 23);
             this.toggleObserveRunningVRC.Style = MetroFramework.MetroColorStyle.Black;
@@ -2037,7 +2117,7 @@
             this.toggleDetectBarcode.Checked = true;
             this.toggleDetectBarcode.CheckState = System.Windows.Forms.CheckState.Checked;
             this.toggleDetectBarcode.FontSize = MetroFramework.MetroLinkSize.Medium;
-            this.toggleDetectBarcode.Location = new System.Drawing.Point(664, 62);
+            this.toggleDetectBarcode.Location = new System.Drawing.Point(566, 62);
             this.toggleDetectBarcode.Name = "toggleDetectBarcode";
             this.toggleDetectBarcode.Size = new System.Drawing.Size(97, 23);
             this.toggleDetectBarcode.Style = MetroFramework.MetroColorStyle.Black;
@@ -2075,7 +2155,7 @@
             this.metroPanel3.HorizontalScrollbarSize = 10;
             this.metroPanel3.Location = new System.Drawing.Point(23, 91);
             this.metroPanel3.Name = "metroPanel3";
-            this.metroPanel3.Size = new System.Drawing.Size(738, 31);
+            this.metroPanel3.Size = new System.Drawing.Size(640, 31);
             this.metroPanel3.TabIndex = 18;
             this.metroPanel3.VerticalScrollbarBarColor = true;
             this.metroPanel3.VerticalScrollbarHighlightOnWheel = false;
@@ -2087,7 +2167,7 @@
             this.toggleOpenBarcode.Checked = true;
             this.toggleOpenBarcode.CheckState = System.Windows.Forms.CheckState.Checked;
             this.toggleOpenBarcode.FontSize = MetroFramework.MetroLinkSize.Medium;
-            this.toggleOpenBarcode.Location = new System.Drawing.Point(641, 5);
+            this.toggleOpenBarcode.Location = new System.Drawing.Point(543, 5);
             this.toggleOpenBarcode.Name = "toggleOpenBarcode";
             this.toggleOpenBarcode.Size = new System.Drawing.Size(97, 23);
             this.toggleOpenBarcode.Style = MetroFramework.MetroColorStyle.Black;
@@ -2112,7 +2192,7 @@
             this.metroTabPage1.HorizontalScrollbarSize = 10;
             this.metroTabPage1.Location = new System.Drawing.Point(4, 38);
             this.metroTabPage1.Name = "metroTabPage1";
-            this.metroTabPage1.Size = new System.Drawing.Size(776, 472);
+            this.metroTabPage1.Size = new System.Drawing.Size(746, 472);
             this.metroTabPage1.TabIndex = 5;
             this.metroTabPage1.Text = "クレジット";
             this.metroTabPage1.VerticalScrollbarBarColor = true;
@@ -2128,7 +2208,7 @@
             // 
             // 
             this.metroTextBox2.CustomButton.Image = null;
-            this.metroTextBox2.CustomButton.Location = new System.Drawing.Point(306, 2);
+            this.metroTextBox2.CustomButton.Location = new System.Drawing.Point(276, 2);
             this.metroTextBox2.CustomButton.Name = "";
             this.metroTextBox2.CustomButton.Size = new System.Drawing.Size(461, 461);
             this.metroTextBox2.CustomButton.Style = MetroFramework.MetroColorStyle.Blue;
@@ -2172,7 +2252,7 @@
             this.metroTextBox2.SelectionLength = 0;
             this.metroTextBox2.SelectionStart = 0;
             this.metroTextBox2.ShortcutsEnabled = true;
-            this.metroTextBox2.Size = new System.Drawing.Size(770, 466);
+            this.metroTextBox2.Size = new System.Drawing.Size(740, 466);
             this.metroTextBox2.TabIndex = 2;
             this.metroTextBox2.Text = resources.GetString("metroTextBox2.Text");
             this.metroTextBox2.UseSelectable = true;
@@ -2359,10 +2439,10 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(830, 600);
+            this.ClientSize = new System.Drawing.Size(800, 600);
             this.Controls.Add(this.windowTabControl);
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
-            this.MinimumSize = new System.Drawing.Size(830, 400);
+            this.MinimumSize = new System.Drawing.Size(600, 400);
             this.Name = "vrcsstMainWindow";
             this.Text = "VRCSSTweaks";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.vrcsstMainWindow_FormClosing);
@@ -2425,7 +2505,7 @@
         private MetroFramework.Controls.MetroPanel metroPanel1;
         private MetroFramework.Controls.MetroLabel metroLabel1;
         private MetroFramework.Controls.MetroButton ssFolderSelectButton;
-        private MetroFramework.Controls.MetroTextBox ssFolderPath;
+        private MetroFramework.Controls.MetroTextBox textBoxSSFolder;
         private MetroFramework.Controls.MetroToggle toggleObserveSS;
         private MetroFramework.Controls.MetroLabel metroLabel2;
         private MetroFramework.Controls.MetroLabel metroLabel5;
@@ -2564,6 +2644,12 @@
         private MetroFramework.Controls.MetroLabel metroLabel40;
         private MetroFramework.Controls.MetroLabel metroLabel41;
         private MetroFramework.Controls.MetroToggle toggleUseDarkMode;
+        private MetroFramework.Controls.MetroComboBox comboBoxCloseButtonMode;
+        private MetroFramework.Controls.MetroLabel metroLabel44;
+        private MetroFramework.Controls.MetroComboBox comboBoxMinButtonMode;
+        private MetroFramework.Controls.MetroLabel metroLabel43;
+        private MetroFramework.Controls.MetroLabel metroLabel42;
+        private MetroFramework.Controls.MetroToggle toggleStartWithMinimized;
     }
 }
 

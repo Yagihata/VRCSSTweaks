@@ -46,6 +46,7 @@ namespace VRCSSTweaks
         }
 
         private FileSystemWatcher fileSystemWatcher = null;
+        private FileSystemWatcher newSSMoverWatcher = null;
         private Dictionary<string, List<string>> containTagList = new Dictionary<string, List<string>>();
         private SortableBindingList<TagItem> tagItems = new SortableBindingList<TagItem>();
         private SortableBindingList<TagItem> hashTagItems = new SortableBindingList<TagItem>();
@@ -60,54 +61,51 @@ namespace VRCSSTweaks
         private string accessToken = "";
         private string accessSecret = "";
         private Tokens tweeetToken = null;
+        private bool minimizeWithCloseButton = false;
         private string msgURL = "";
         private DateTime msgLastGotTime = DateTime.MinValue;
+        private string lastDetectSSPath = "";
         public vrcsstMainWindow()
         {
             InitializeComponent();
+            Environment.CurrentDirectory = Path.GetDirectoryName(Application.ExecutablePath);
+            Directory.SetCurrentDirectory(Environment.CurrentDirectory);
+
             comboBoxCompressMethod.SelectedIndex = 1;
             comboBoxCompressLevel.SelectedIndex = 9;
             textBoxCompressDays.Text = "180";
             windowTabControl.SelectedIndex = 0;
-
-            if (!Directory.Exists(ssFolderPath.Text))
-                ssFolderPath.Text = Environment.GetFolderPath(Environment.SpecialFolder.MyPictures) + "\\VRChat";
-            if (!Directory.Exists(ssFolderPath.Text))
-            {
-                MessageBox.Show("VRChatのスクリーンショットフォルダが見つかりません\nスクリーンショットのフォルダを選択して下さい");
-                using (var ofd = new CommonOpenFileDialog() { InitialDirectory = Environment.GetFolderPath(Environment.SpecialFolder.MyPictures), DefaultFileName = "VRChat", IsFolderPicker = true })
-                {
-                    if (ofd.ShowDialog() == CommonFileDialogResult.Ok)
-                    {
-                        ssFolderPath.Text = ofd.FileName;
-                    }
-                }
-            }
-
-
-            if (fileSystemWatcher != null) return;
-
-            fileSystemWatcher = new FileSystemWatcher();
-            //監視するディレクトリを指定
-            fileSystemWatcher.Path = ssFolderPath.Text;
-            //最終アクセス日時、最終更新日時、ファイル、フォルダ名の変更を監視する
-            fileSystemWatcher.NotifyFilter = NotifyFilters.LastWrite;
-            //すべてのファイルを監視
-            fileSystemWatcher.Filter = "*.png";
-            //UIのスレッドにマーシャリングする
-            //コンソールアプリケーションでの使用では必要ない
-            fileSystemWatcher.SynchronizingObject = this;
-
-            //イベントハンドラの追加
-            fileSystemWatcher.Changed += new FileSystemEventHandler(fileSystemWatcher_Changed);
-            fileSystemWatcher.Created += new FileSystemEventHandler(fileSystemWatcher_Changed);
-            fileSystemWatcher.Deleted += new FileSystemEventHandler(fileSystemWatcher_Changed);
+            comboBoxMinButtonMode.SelectedIndex = 0;
+            comboBoxCloseButtonMode.SelectedIndex = 2;
 
             //Load XML
             LoadConfig();
             LoadTags();
             LoadKeys();
 
+
+            CheckSSFolderIsExist();
+
+            fileSystemWatcher = new FileSystemWatcher();
+            fileSystemWatcher.Path = GetSSFolderPath();
+            fileSystemWatcher.NotifyFilter = NotifyFilters.LastWrite;
+            fileSystemWatcher.Filter = "*.png";
+            fileSystemWatcher.SynchronizingObject = this;
+            fileSystemWatcher.Created += new FileSystemEventHandler(fileSystemWatcher_Changed);
+            fileSystemWatcher.Changed += new FileSystemEventHandler(fileSystemWatcher_Changed);
+            //fileSystemWatcher.Deleted += new FileSystemEventHandler(fileSystemWatcher_Changed);
+            fileSystemWatcher.EnableRaisingEvents = true;
+
+            newSSMoverWatcher = new FileSystemWatcher();
+            newSSMoverWatcher.Path = Environment.GetFolderPath(Environment.SpecialFolder.MyPictures) + "\\VRChat";
+            newSSMoverWatcher.NotifyFilter = NotifyFilters.LastWrite;
+            newSSMoverWatcher.Filter = "*.png";
+            newSSMoverWatcher.SynchronizingObject = this;
+            newSSMoverWatcher.Created += new FileSystemEventHandler(newSSMoverWatcher_Changed);
+            newSSMoverWatcher.Changed += new FileSystemEventHandler(newSSMoverWatcher_Changed);
+            newSSMoverWatcher.Created += new FileSystemEventHandler(newSSMoverWatcher_Changed);
+            //newSSMoverWatcher.Deleted += new FileSystemEventHandler(newSSMoverWatcher_Changed);
+            newSSMoverWatcher.EnableRaisingEvents = true;
             if (toggleUseDarkMode.Checked)
                 metroStyleManager1.Theme = MetroThemeStyle.Dark;
             else
@@ -116,12 +114,79 @@ namespace VRCSSTweaks
             this.components.SetDefaultStyle(this, metroStyleManager1.Style);
             this.components.SetDefaultTheme(this, metroStyleManager1.Theme);
             this.StyleManager = metroStyleManager1;
-            listViewTweetImage.BackColor = this.BackColor;
-            listViewTweetQueue.BackColor = this.BackColor;
+
         }
+
+        private void newSSMoverWatcher_Changed(object sender, FileSystemEventArgs e)
+        {
+            if (IsSSFolderLinked())
+            {
+                CheckSSFolderIsExist();
+                var path = e.FullPath;
+                var directoryPath = GetSSFolderPath() + "\\";
+                try
+                {
+                    var dest = directoryPath + Path.GetFileName(path);
+                    if (!File.Exists(dest))
+                        File.Move(path, dest);
+                }
+                catch
+                {
+
+                }
+            }
+        }
+        private bool IsSSFolderLinked()
+        {
+            var srcPath = Environment.GetFolderPath(Environment.SpecialFolder.MyPictures) + "\\VRChat";
+            var destPath = textBoxSSFolder.Text;
+            return (!string.IsNullOrEmpty(destPath) && destPath != srcPath);
+        }
+        private void CheckSSFolderIsExist()
+        {
+            if (!Directory.Exists(Environment.GetFolderPath(Environment.SpecialFolder.MyPictures) + "\\VRChat"))
+            {
+                MessageBox.Show("VRChatのスクリーンショットフォルダが見つかりません\nマイピクチャ内にVRChatフォルダが存在していることを確認してください");
+                Application.Exit();
+            }
+            if (IsSSFolderLinked())
+            {
+                var destPath = textBoxSSFolder.Text;
+                try
+                {
+                    if(!Directory.Exists(destPath))
+                    {
+                        Directory.CreateDirectory(destPath);
+                    }
+                }
+                catch
+                {
+                    MessageBox.Show("リンクフォルダにアクセスできませんでした");
+                    textBoxSSFolder.Text = "";
+                }
+            }
+        }
+        private string GetSSFolderPath()
+        {
+            CheckSSFolderIsExist();
+            if (IsSSFolderLinked())
+                return textBoxSSFolder.Text;
+            
+            return Environment.GetFolderPath(Environment.SpecialFolder.MyPictures) + "\\VRChat";
+        }
+        IEnumerable<int> waitCounter = Enumerable.Range(0, 50);
         private void fileSystemWatcher_Changed(object sender, FileSystemEventArgs e)
         {
             var path = e.FullPath;
+            if (path == lastDetectSSPath)
+                return;
+            lastDetectSSPath = path;
+            foreach(var v in waitCounter)
+            {
+                if (File.Exists(path))
+                    break;
+                Task.Delay(100).Wait();
+            }
             if (!toggleObserveRunningVRC.Checked || CheckIsVRCRunning())
             {
                 if (toggleSortSS.Checked)
@@ -129,7 +194,7 @@ namespace VRCSSTweaks
                     var info = new FileInfo(path);
                     var date = info.CreationTime - TimeSpan.FromHours(int.Parse(textBoxBorderHour.Text));
                     var folderName = string.Format("{0}-{1:D2}-{2:D2}", date.Year, date.Month, date.Day);
-                    var directoryPath = ssFolderPath.Text + "\\" + folderName;
+                    var directoryPath = GetSSFolderPath() + "\\" + folderName;
                     var newPath = directoryPath + "\\" + Path.GetFileName(path);
                     try
                     {
@@ -140,7 +205,7 @@ namespace VRCSSTweaks
                         LoadRecentlyImage(newPath);
                         if (windowTabControl.SelectedIndex == 0)
                             LoadTagsData(GetSHA256(lastFilePath));
-                        if (ssFolderPath.Text == currentDirectory)
+                        if (GetSSFolderPath() == currentDirectory)
                         {
                             var dirInfo = new DirectoryInfo(directoryPath);
                             var fileItem = new FileItem();
@@ -257,16 +322,18 @@ namespace VRCSSTweaks
                 tagSelectorBindingSource.DataSource = tagItems;
                 metroComboBox2.DataSource = tagSelectorBindingSource;
                 gridTweetHashtagList.DataSource = hashTagItems;
-                currentDirectory = ssFolderPath.Text;
+                currentDirectory = GetSSFolderPath();
                 LoadRecentlyImage(lastFilePath, false);
                 LoadPreviewImage(null);
                 finishInit = true;
 
                 Task.Factory.StartNew(async () =>
                 {
-                    await Task.Delay(500);
+                    await Task.Delay(100);
                     this.Invoke((MethodInvoker)(() =>
                     {
+                        listViewTweetImage.BackColor = this.BackColor;
+                        listViewTweetQueue.BackColor = this.BackColor;
                         CheckNewMessage();
                         if (toggleSortSS.Checked)
                             SortScreenshot(true);
@@ -274,6 +341,8 @@ namespace VRCSSTweaks
                             CompressScrenshot();
                         else
                             fileListRefresher.RunWorkerAsync();
+                        if (toggleStartWithMinimized.Checked)
+                            WindowState = FormWindowState.Minimized;
                     }));
                 });
             }
@@ -316,8 +385,17 @@ namespace VRCSSTweaks
         {
             if (WindowState != FormWindowState.Minimized)
                 return;
-            Visible = false;
-            notifyIcon1.Visible = true;
+            var index = minimizeWithCloseButton ? comboBoxCloseButtonMode.SelectedIndex : comboBoxMinButtonMode.SelectedIndex;
+            if (index == 0)
+            {
+                Visible = false;
+                notifyIcon1.Visible = true;
+            }
+            else if(index == 2)
+            {
+                Application.Exit();
+            }
+            minimizeWithCloseButton = false;
         }
 
         private void notifyIcon1_MouseDoubleClick(object sender, MouseEventArgs e)
@@ -328,8 +406,17 @@ namespace VRCSSTweaks
         }
         private void vrcsstMainWindow_FormClosing(object sender, FormClosingEventArgs e)
         {
-            SaveConfig();
-            SaveTags();
+            if (comboBoxCloseButtonMode.SelectedIndex != 2 && e.CloseReason == CloseReason.UserClosing)
+            {
+                minimizeWithCloseButton = true;
+                e.Cancel = true;
+                WindowState = FormWindowState.Minimized;
+            }
+            else
+            {
+                SaveConfig();
+                SaveTags();
+            }
         }
         private void LoadKeys()
         {
@@ -349,7 +436,7 @@ namespace VRCSSTweaks
             var xmlFile = XElement.Load(path);
             var vrcSSTSettings = xmlFile;
 
-            ssFolderPath.Text = (string)GetConfigValue(vrcSSTSettings, "SSDirectoryPath", ssFolderPath.Text, typeof(string));
+            textBoxSSFolder.Text = (string)GetConfigValue(vrcSSTSettings, "LinkedSSPath", textBoxSSFolder.Text, typeof(string));
 
             toggleObserveSS.Checked = (bool)GetConfigValue(vrcSSTSettings, "ObserveScreenShot", toggleObserveSS.Checked, typeof(bool));
             toggleObserveRunningVRC.Checked = (bool)GetConfigValue(vrcSSTSettings, "ObserveWithVRCRunning", toggleObserveRunningVRC.Checked, typeof(bool));
@@ -372,6 +459,9 @@ namespace VRCSSTweaks
             msgLastGotTime = (DateTime)GetConfigValue(vrcSSTSettings, "MessageGotTime", msgLastGotTime, typeof(DateTime));
             textBoxBorderHour.Text = (string)GetConfigValue(vrcSSTSettings, "DayBorder", textBoxBorderHour.Text, typeof(string));
             toggleUseDarkMode.Checked = (bool)GetConfigValue(vrcSSTSettings, "DarkMode", toggleUseDarkMode.Checked, typeof(bool));
+            toggleStartWithMinimized.Checked = (bool)GetConfigValue(vrcSSTSettings, "MinimizedStart", toggleStartWithMinimized.Checked, typeof(bool));
+            comboBoxMinButtonMode.SelectedIndex = (int)GetConfigValue(vrcSSTSettings, "MinimizeMode", comboBoxMinButtonMode.SelectedIndex, typeof(int));
+            comboBoxCloseButtonMode.SelectedIndex = (int)GetConfigValue(vrcSSTSettings, "CloseMode", comboBoxCloseButtonMode.SelectedIndex, typeof(int));
         }
         private void LogOutput(string log)
         {
@@ -383,7 +473,7 @@ namespace VRCSSTweaks
         {
             var path = Directory.GetCurrentDirectory() + @"\config.xml";
             var xmlFile = new XElement("VRCSSTSettings");
-            xmlFile.Add(new XElement("SSDirectoryPath", ssFolderPath.Text));
+            xmlFile.Add(new XElement("LinkedSSPath", textBoxSSFolder.Text));
             xmlFile.Add(new XElement("ObserveScreenShot", toggleObserveSS.Checked));
             xmlFile.Add(new XElement("ObserveWithVRCRunning", toggleObserveRunningVRC.Checked));
             xmlFile.Add(new XElement("DetectBarcode", toggleDetectBarcode.Checked));
@@ -403,6 +493,9 @@ namespace VRCSSTweaks
             xmlFile.Add(new XElement("MessageGotTime", msgLastGotTime));
             xmlFile.Add(new XElement("DayBorder", textBoxBorderHour.Text));
             xmlFile.Add(new XElement("DarkMode", toggleUseDarkMode.Checked));
+            xmlFile.Add(new XElement("MinimizedStart", toggleStartWithMinimized.Checked));
+            xmlFile.Add(new XElement("MinimizeMode", comboBoxMinButtonMode.SelectedIndex));
+            xmlFile.Add(new XElement("CloseMode", comboBoxCloseButtonMode.SelectedIndex));
             xmlFile.Save(path);
         }
         private void LoadTags()
@@ -489,7 +582,7 @@ namespace VRCSSTweaks
         {
             LoadPreviewImage(null);
             LoadRecentlyImage(null);
-            var files = Directory.GetFiles(ssFolderPath.Text, "*.png");
+            var files = Directory.GetFiles(GetSSFolderPath(), "*.png");
             var dialog = new ProgressWindow(metroStyleManager1);
             dialog.Title = "スクリーンショット整理中...";
             dialog.MaxValue = files.Length;
@@ -507,7 +600,7 @@ namespace VRCSSTweaks
                     var info = new FileInfo(path);
                     var date = info.CreationTime;
                     var folderName = string.Format("{0}-{1:D2}-{2:D2}", date.Year, date.Month, date.Day);
-                    var directoryPath = ssFolderPath.Text + "\\" + folderName;
+                    var directoryPath = GetSSFolderPath() + "\\" + folderName;
                     try
                     {
                         if (!Directory.Exists(directoryPath))
@@ -538,11 +631,11 @@ namespace VRCSSTweaks
         }
         private void metroButton6_Click(object sender, EventArgs e)
         {
-            var files = Directory.GetFiles(ssFolderPath.Text, "*.png", SearchOption.AllDirectories);
+            var files = Directory.GetFiles(GetSSFolderPath(), "*.png", SearchOption.AllDirectories);
             foreach (var path in files)
             {
-                if (Path.GetDirectoryName(path) != ssFolderPath.Text)
-                    File.Move(path, ssFolderPath.Text + "\\" + Path.GetFileName(path));
+                if (Path.GetDirectoryName(path) != GetSSFolderPath())
+                    File.Move(path, GetSSFolderPath() + "\\" + Path.GetFileName(path));
             }
         }
 
@@ -598,7 +691,7 @@ namespace VRCSSTweaks
             lastCompressDate = (byte)DateTime.Now.Day;
             LoadPreviewImage(null);
             LoadRecentlyImage(null);
-            var files = Directory.GetFiles(ssFolderPath.Text, "*.png", SearchOption.AllDirectories);
+            var files = Directory.GetFiles(GetSSFolderPath(), "*.png", SearchOption.AllDirectories);
             var dialog = new ProgressWindow(metroStyleManager1);
             dialog.Title = "スクリーンショット圧縮中...";
             dialog.MaxValue = files.Length;
@@ -621,8 +714,8 @@ namespace VRCSSTweaks
                 var limit = int.Parse(textBoxCompressDays.Text);
                 long byteCount = 0;
                 var deletePath = new List<string>();
-                if (!Directory.Exists(ssFolderPath.Text + "\\Archives"))
-                    Directory.CreateDirectory(ssFolderPath.Text + "\\Archives");
+                if (!Directory.Exists(GetSSFolderPath() + "\\Archives"))
+                    Directory.CreateDirectory(GetSSFolderPath() + "\\Archives");
                 foreach (var path in files)
                 {
                     var info = new FileInfo(path);
@@ -631,11 +724,11 @@ namespace VRCSSTweaks
                     {
                         var zipName = "";
                         if (bindmode == 0)
-                            zipName = ssFolderPath.Text + "\\Archives\\" + string.Format("{0}-{1:D2}-{2:D2}_L{3}.zip", date.Year, date.Month, date.Day, levelIndex);
+                            zipName = GetSSFolderPath() + "\\Archives\\" + string.Format("{0}-{1:D2}-{2:D2}_L{3}.zip", date.Year, date.Month, date.Day, levelIndex);
                         else if (bindmode == 1)
-                            zipName = ssFolderPath.Text + "\\Archives\\" + string.Format("{0}-{1:D1}_L{2}.zip", date.Year, date.Month, levelIndex);
+                            zipName = GetSSFolderPath() + "\\Archives\\" + string.Format("{0}-{1:D1}_L{2}.zip", date.Year, date.Month, levelIndex);
                         else
-                            zipName = ssFolderPath.Text + "\\Archives\\" + string.Format("CompressedSS_L{0}.zip", levelIndex);
+                            zipName = GetSSFolderPath() + "\\Archives\\" + string.Format("CompressedSS_L{0}.zip", levelIndex);
                         if (zip == null || zipName != currentZipFile)
                         {
                             if (zip != null)
@@ -648,7 +741,7 @@ namespace VRCSSTweaks
                             zip.CompressionLevel = level;
                             currentZipFile = zipName;
                         }
-                        var entryName = Path.GetDirectoryName(path).Replace(ssFolderPath.Text + "\\", "");
+                        var entryName = Path.GetDirectoryName(path).Replace(GetSSFolderPath() + "\\", "");
                         try
                         {
                             zip.AddItem(path, entryName);
@@ -707,7 +800,7 @@ namespace VRCSSTweaks
 
         private void 終了ToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            this.Close();
+            Application.Exit();
         }
     }
 }
