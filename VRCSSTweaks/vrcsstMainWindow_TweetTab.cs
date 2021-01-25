@@ -107,7 +107,8 @@ namespace VRCSSTweaks
                 List<MediaUploadResult> pics = new List<MediaUploadResult>();
                 foreach (var v in selectedPostImage)
                 {
-                    pics.Add(tweeetToken.Media.Upload(media: new FileInfo(v)));
+                    if (File.Exists(v))
+                        pics.Add(tweeetToken.Media.Upload(media: new FileInfo(v)));
                 }
                 string tags = "";
                 if (hashTagItems.Any(n => n.IsChecked))

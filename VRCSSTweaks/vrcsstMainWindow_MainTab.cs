@@ -116,13 +116,13 @@ namespace VRCSSTweaks
                     {
                         var sha = GetSHA256(lastFilePath);
                         if (!containTagList.ContainsKey(sha))
-                            containTagList.Add(sha, new List<string>());
+                            containTagList.Add(sha, new FilePathTagList() { FilePath = lastFilePath});
                         var name = gridNSSTagList.Rows[e.RowIndex].Cells[0];
                         var check = (bool)(gridNSSTagList.Rows[e.RowIndex].Cells[1] as DataGridViewCheckBoxCell).Value;
                         if (name != null && !string.IsNullOrEmpty(name.Value.ToString()))
                         {
                             var nameStr = name.Value.ToString();
-                            var list = containTagList[sha];
+                            var list = containTagList[sha].TagItems;
                             if (check)
                             {
                                 if (!list.Contains(nameStr))

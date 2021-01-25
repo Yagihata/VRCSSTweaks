@@ -108,6 +108,7 @@
       <SubType>Component</SubType>
     </Compile>
     <Compile Include="FileItem.cs" />
+    <Compile Include="FilePathTagList.cs" />
     <Compile Include="FileSize.cs" />
     <Compile Include="AuthWindow.cs">
       <SubType>Form</SubType>

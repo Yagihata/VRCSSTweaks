@@ -15,10 +15,11 @@ namespace VRCSSTweaks
     public partial class vrcsstMainWindow
     {
         private List<FileItem> rawFileItems = new List<FileItem>();
+        private List<FileItem> tempFileItems = null;
         public SortableFileItems fileItems = null;
         private int lastSelectedFileIndex = -1;
         private string currentDirectory = "";
-        private string currentPreviewImageSHA256 = "";
+        private string currentPreviewImagePath = "";
         private void ClearTagsData()
         {
             foreach (var v in tagItems)
@@ -30,7 +31,7 @@ namespace VRCSSTweaks
                 v.IsChecked = false;
             if (containTagList.ContainsKey(key))
             {
-                foreach (var v in containTagList[key])
+                foreach (var v in containTagList[key].TagItems)
                 {
                     var index = tagItems.Select(n => n.Name).ToList().IndexOf(v);
                     if (index >= 0)
@@ -42,6 +43,23 @@ namespace VRCSSTweaks
                 }
             }
         }
+        private string[] GetSelectedItemsPath(bool fileOnly = false)
+        {
+            var rows = metroGrid1.SelectedRows.Cast<DataGridViewRow>();
+            var modif = "";
+            if (!metroCheckBox1.Checked)
+                modif = currentDirectory + "\\";
+            if (rows != null && rows.Count() > 0)
+            {
+                var items = rows.Where(n => n.Cells[0] != null && n.Cells[0].Value != null && 
+                (!fileOnly || n.Cells[3] == null || n.Cells[3].Value == null || !n.Cells[3].Value.ToString().Split(',').Contains("Folder")))
+                    .Select(n => n.Cells[0].Value.ToString())
+                    .Where(n => !string.IsNullOrEmpty(n) && n != "...");
+                if (items.Count() > 0)
+                    return items.Select(n => modif + n).ToArray();
+            }
+            return new string[] { };
+        }
         private void RefreshFileListTags()
         {
             foreach(var file in fileItems)
@@ -50,10 +68,15 @@ namespace VRCSSTweaks
                 file.Tags.Clear();
                 if (isFolder)
                     file.Tags.Add("Folder");
-                var sha256 = GetSHA256(currentDirectory + "\\" + file.Name);
+                
+                var sha256 = "";
+                if (metroCheckBox1.Checked)
+                    sha256 = GetSHA256(file.Name);
+                else
+                    sha256 = GetSHA256(currentDirectory + "\\" + file.Name);
                 if (containTagList.ContainsKey(sha256))
                 {
-                    foreach (var v in containTagList[sha256])
+                    foreach (var v in containTagList[sha256].TagItems)
                         file.AddTag(v);
                 }
             }
@@ -63,7 +86,7 @@ namespace VRCSSTweaks
             ClearTagsData();
             if (string.IsNullOrEmpty(path) || !File.Exists(path))
             {
-                currentPreviewImageSHA256 = "";
+                currentPreviewImagePath = "";
                 labelPreviewSSName.Text = "";
                 labelPreviewSSDate.Text = "";
                 labelPreviewSSSize.Text = "";
@@ -74,8 +97,8 @@ namespace VRCSSTweaks
             else
             {
                 gridPRSSTagList.Enabled = true;
-                currentPreviewImageSHA256 = GetSHA256(path);
-                LoadTagsData(currentPreviewImageSHA256);
+                currentPreviewImagePath = path;
+                LoadTagsData(GetSHA256(path));
                 gridPRSSTagList.DataSource = null;
                 gridPRSSTagList.DataSource = tagListBindingSource;
                 ((CurrencyManager)gridPRSSTagList.BindingContext[tagListBindingSource]).Refresh();
@@ -118,20 +141,48 @@ namespace VRCSSTweaks
                     selectedFile = fileItems[lastSelectedFileIndex].Name;
                 lastSelectedFileIndex = -1;
                 fileItems.Clear();
+                if (tempFileItems != null)
+                {
+                    rawFileItems = tempFileItems;
+                    tempFileItems = null;
+                }
                 if (metroCheckBox1.Checked && metroComboBox2.SelectedItem != null)
                 {
-                    foreach (var v in rawFileItems)
+                    tempFileItems = rawFileItems;
+                    rawFileItems = new List<FileItem>();
+                    var tagContainFiles = new Dictionary<string, string>();
+                    var selectedTag = (metroComboBox2.SelectedItem as TagItem).Name;
+                    List<string> missingFiles = null;
+
+                    foreach(var v in containTagList.Where(n => n.Value.TagItems.Contains(selectedTag)))
                     {
-                        if (v.Tags.Contains((metroComboBox2.SelectedItem as TagItem).Name) || v.Name == "...")
-                            fileItems.Add(v);
+                        var path = v.Value.FilePath;
+                        if (File.Exists(path))
+                        {
+                            var info = new FileInfo(path);
+                            var fileItem = new FileItem();
+                            fileItem.Name = path;
+                            fileItem.Size = new FileSize(info);
+                            fileItem.Date = info.LastWriteTime.ToString();
+                            fileItem.Tags.AddRange(v.Value.TagItems);
+                            rawFileItems.Add(fileItem);
+                        }
+                        else
+                        {
+                            if (missingFiles == null)
+                                missingFiles = new List<string>();
+
+                            missingFiles.Add(v.Key);
+                        }
+                    }
+                    if (missingFiles != null)
+                    {
+                        foreach (var v in missingFiles)
+                            containTagList.Remove(v);
                     }
                 }
-                else
-                {
-                    foreach (var v in rawFileItems)
-                        fileItems.Add(v);
-                }
-
+                foreach (var v in rawFileItems)
+                    fileItems.Add(v);
                 metroGrid1.Enabled = true;
                 metroGrid1.DataSource = fileItems;
                 metroGrid1.ScrollBars = ScrollBars.Both;
@@ -171,7 +222,7 @@ namespace VRCSSTweaks
             {
                 PoseFileList();
             }));
-            rawFileItems.Clear();
+            GetFileItemsList().Clear();
             var directories = Directory.GetDirectories(currentDirectory);
             foreach (var path in directories)
             {
@@ -181,7 +232,7 @@ namespace VRCSSTweaks
                 fileItem.Size = new FileSize(-1);
                 fileItem.Date = info.LastWriteTime.ToString();
                 fileItem.AddTag("Folder");
-                rawFileItems.Add(fileItem);
+                GetFileItemsList().Add(fileItem);
             }
             var files = Directory.GetFiles(currentDirectory, "*.png");
             foreach (var path in files)
@@ -194,10 +245,10 @@ namespace VRCSSTweaks
                 var sha256 = GetSHA256(path);
                 if (containTagList.ContainsKey(sha256))
                 {
-                    foreach (var v in containTagList[sha256])
+                    foreach (var v in containTagList[sha256].TagItems)
                         fileItem.AddTag(v);
                 }
-                rawFileItems.Add(fileItem);
+                GetFileItemsList().Add(fileItem);
             }
         }
 
@@ -207,7 +258,7 @@ namespace VRCSSTweaks
             {
                 var item = new FileItem() { Name = "...", Date = "", Size = new FileSize(-2) };
                 item.AddTag("Folder");
-                rawFileItems.Insert(0, item);
+                GetFileItemsList().Insert(0, item);
             }
             UpdateFileList();
         }
@@ -233,7 +284,8 @@ namespace VRCSSTweaks
                 }
                 else
                 {
-                    RegisterToImageQueue(currentDirectory + "\\" + metroGrid1.Rows[e.RowIndex].Cells[0].Value.ToString());
+                    foreach (var v in GetSelectedItemsPath(true))
+                        RegisterToImageQueue(v);
                 }
             }
         }
@@ -241,6 +293,25 @@ namespace VRCSSTweaks
         {
             DataGridView dgv = sender as DataGridView;
             DataGridViewCell cell = dgv.CurrentCell;
+            var count = GetSelectedItemsPath(true).Count();
+            if (count == 1)
+            {
+                gridPRSSTagList.Columns[1].Visible = true;
+                gridPRSSTagList.Columns[2].Visible = false;
+                gridPRSSTagList.Columns[3].Visible = false;
+            }
+            else if (count > 1)
+            {
+                gridPRSSTagList.Columns[1].Visible = false;
+                gridPRSSTagList.Columns[2].Visible = true;
+                gridPRSSTagList.Columns[3].Visible = true;
+            }
+            else
+            {
+                gridPRSSTagList.Columns[1].Visible = false;
+                gridPRSSTagList.Columns[2].Visible = false;
+                gridPRSSTagList.Columns[3].Visible = false;
+            }
             if (cell == null)
             {
                 lastSelectedFileIndex = -1;
@@ -258,7 +329,7 @@ namespace VRCSSTweaks
                 }
             }
             if (metroGrid1.Rows[cell.RowIndex].Cells[0] != null)
-                LoadPreviewImage(currentDirectory + "\\" + metroGrid1.Rows[cell.RowIndex].Cells[0].Value.ToString());
+                LoadPreviewImage(GetSelectedItemsPath().FirstOrDefault());
         }
 
         private void metroButton4_Click(object sender, EventArgs e)
@@ -321,27 +392,28 @@ namespace VRCSSTweaks
                     }
                     else if (e.ColumnIndex == 1)
                     {
-                        if (!containTagList.ContainsKey(currentPreviewImageSHA256))
-                            containTagList.Add(currentPreviewImageSHA256, new List<string>());
+                        var sha = GetSHA256(currentPreviewImagePath);
+                        if (!containTagList.ContainsKey(sha))
+                            containTagList.Add(sha, new FilePathTagList() { FilePath = currentPreviewImagePath });
                         var name = gridPRSSTagList.Rows[e.RowIndex].Cells[0];
                         var check = (bool)(gridPRSSTagList.Rows[e.RowIndex].Cells[1] as DataGridViewCheckBoxCell).Value;
+                        var filelist = GetFileItemsList();
                         if (name != null && !string.IsNullOrEmpty(name.Value.ToString()))
                         {
                             var nameStr = name.Value.ToString();
-                            var list = containTagList[currentPreviewImageSHA256];
+                            var list = containTagList[sha];
                             if (check)
                             {
-                                if (!list.Contains(nameStr))
-                                    list.Add(nameStr);
-                                rawFileItems.First(n => n.Name == labelPreviewSSName.Text).AddTag(nameStr);
+                                if (!list.TagItems.Contains(nameStr))
+                                    list.TagItems.Add(nameStr);
+                                filelist.First(n => n.Name == labelPreviewSSName.Text).AddTag(nameStr);
                             }
                             else if (!check)
                             {
-                                if (list.Contains(nameStr))
-                                    list.Remove(nameStr);
-                                rawFileItems.First(n => n.Name == labelPreviewSSName.Text).RemoveTag(nameStr);
+                                if (list.TagItems.Contains(nameStr))
+                                    list.TagItems.Remove(nameStr);
+                                filelist.First(n => n.Name == labelPreviewSSName.Text).RemoveTag(nameStr);
                             }
-                            //((CurrencyManager)metroGrid1.BindingContext[fileItems]).Refresh();
                             metroGrid1.Refresh();
                         }
                     }
@@ -359,8 +431,54 @@ namespace VRCSSTweaks
         private void metroGrid2_CellContentClick(object sender, DataGridViewCellEventArgs e)
         {
             if (windowTabControl.SelectedIndex == 1)
+            {
                 if (e.ColumnIndex == 1)
-                (sender as DataGridView).CommitEdit(DataGridViewDataErrorContexts.Commit);
+                    (sender as DataGridView).CommitEdit(DataGridViewDataErrorContexts.Commit);
+                else if(e.ColumnIndex == 2 || e.ColumnIndex == 3)
+                {
+                    var files = GetSelectedItemsPath(true);
+                    var check = e.ColumnIndex == 2;
+                    var tagFilterMode = metroCheckBox1.Checked;
+                    foreach (var file in files)
+                    {
+                        var sha = GetSHA256(file);
+                        if (!containTagList.ContainsKey(sha))
+                            containTagList.Add(sha, new FilePathTagList() { FilePath = file });
+                        var name = gridPRSSTagList.Rows[e.RowIndex].Cells[0];
+                        if (name != null && !string.IsNullOrEmpty(name.Value.ToString()))
+                        {
+                            var nameStr = name.Value.ToString();
+                            var list = containTagList[sha];
+                            var fileName = Path.GetFileName(file);
+                            if (check)
+                            {
+                                if (!list.TagItems.Contains(nameStr))
+                                    list.TagItems.Add(nameStr);
+                                if (!tagFilterMode)
+                                    GetFileItemsList().First(n => n.Name == fileName).AddTag(nameStr);
+                                else
+                                {
+                                    rawFileItems.Find(n => n.Name == file)?.AddTag(nameStr);
+                                    tempFileItems.Find(n => n.Name == fileName)?.AddTag(nameStr);
+                                }
+                            }
+                            else if (!check)
+                            {
+                                if (list.TagItems.Contains(nameStr))
+                                    list.TagItems.Remove(nameStr);
+                                if (!tagFilterMode)
+                                    GetFileItemsList().First(n => n.Name == fileName).RemoveTag(nameStr);
+                                else
+                                {
+                                    rawFileItems.Find(n => n.Name == file)?.RemoveTag(nameStr);
+                                    tempFileItems.Find(n => n.Name == fileName)?.RemoveTag(nameStr);
+                                }
+                            }
+                        }
+                    }
+                    metroGrid1.Refresh();
+                }
+            }
         }
 
         private void metroGrid2_CellMouseClick(object sender, DataGridViewCellMouseEventArgs e)
@@ -399,26 +517,25 @@ namespace VRCSSTweaks
         }
         private void metroButton10_Click(object sender, EventArgs e)
         {
-            if (!string.IsNullOrEmpty(labelPreviewSSName.Text))
-                RegisterToImageQueue(currentDirectory + "\\" + labelPreviewSSName.Text);
+            var name = GetSelectedItemsPath().FirstOrDefault();
+            if (!string.IsNullOrEmpty(name))
+                RegisterToImageQueue(name);
         }
 
         private void エクスプローラで開くToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            var cell = metroGrid1.CurrentCell;
-            if (metroGrid1.SelectedRows != null)
+            foreach (var v in GetSelectedItemsPath())
             {
-                var arg = string.Format(@"/select,""{0}\{1}""", currentDirectory, metroGrid1.Rows[cell.RowIndex].Cells[0].Value.ToString());
+                var arg = string.Format(@"/select,""{0}""", v);
                 Process.Start("EXPLORER.EXE", arg);
             }
         }
 
         private void コピーToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            var cell = metroGrid1.CurrentCell;
-            if (metroGrid1.SelectedRows != null)
+            string[] fileNames = GetSelectedItemsPath();
+            if (fileNames.Any())
             {
-                string[] fileNames = { string.Format(@"{0}\{1}", currentDirectory, metroGrid1.Rows[cell.RowIndex].Cells[0].Value.ToString()) };
                 IDataObject data = new DataObject(DataFormats.FileDrop, fileNames);
                 byte[] bs = new byte[] { (byte)DragDropEffects.Copy, 0, 0, 0 };
                 MemoryStream ms = new MemoryStream(bs);
@@ -432,26 +549,40 @@ namespace VRCSSTweaks
         {
             try
             {
-                var cell = metroGrid1.CurrentCell;
-                if (metroGrid1.SelectedRows != null)
+                var items = GetSelectedItemsPath();
+                if (items.Any())
                 {
-                    var name = metroGrid1.Rows[cell.RowIndex].Cells[0].Value.ToString();
-                    var path = string.Format(@"{0}\{1}", currentDirectory, name);
-                    var isFolder = metroGrid1.Rows[cell.RowIndex].Cells[3].Value.ToString().Split(',').Contains("Folder");
-                    var message = "選択した" + (isFolder ? "フォルダ" : "ファイル") + "を削除します";
+                    var message = "選択したアイテムを削除します";
                     if (MessageBox.Show(message, "確認", MessageBoxButtons.YesNo) == DialogResult.Yes)
                     {
-                        if (isFolder)
+                        foreach (var path in items)
                         {
-                            CleanUp(path);
+                            if (IsFolder(path))
+                            {
+                                CleanUp(path);
+                            }
+                            else
+                            {
+                                File.Delete(path);
+                            }
+                            var name = path.Split('\\').Last();
+                            if(metroCheckBox1.Checked)
+                            {
+                                var index = rawFileItems.IndexOf(rawFileItems.FirstOrDefault(n => n.Name == path));
+                                if (index >= 0)
+                                    rawFileItems.RemoveAt(index);
+
+                                index = tempFileItems.IndexOf(tempFileItems.FirstOrDefault(n => n.Name == Path.GetFileName(path)));
+                                if (index >= 0)
+                                    tempFileItems.RemoveAt(index);
+                            }
+                            else
+                            {
+                                var index = GetFileItemsList().IndexOf(GetFileItemsList().FirstOrDefault(n => n.Name == name));
+                                if (index >= 0)
+                                    GetFileItemsList().RemoveAt(index);
+                            }
                         }
-                        else
-                        {
-                            File.Delete(path);
-                        }
-                        var index = rawFileItems.IndexOf(fileItems.FirstOrDefault(n => n.Name == name));
-                        if (index >= 0)
-                            rawFileItems.RemoveAt(index);
                         UpdateFileList();
                     }
                 }
@@ -464,26 +595,15 @@ namespace VRCSSTweaks
 
         private void ツイートキューに追加ToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            var cell = metroGrid1.CurrentCell;
-            if (metroGrid1.SelectedRows != null)
-            {
-                var name = metroGrid1.Rows[cell.RowIndex].Cells[0].Value.ToString();
-                var path = string.Format(@"{0}\{1}", currentDirectory, name);
-                var isFolder = metroGrid1.Rows[cell.RowIndex].Cells[3].Value.ToString().Split(',').Contains("Folder");
-                if (isFolder)
-                    MessageBox.Show("フォルダをキューに追加することは出来ません。");
-                else
-                    RegisterToImageQueue(path);
-            }
+            foreach (var path in GetSelectedItemsPath(true))
+                RegisterToImageQueue(path);
         }
 
         private void 切り取りToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            var cell = metroGrid1.CurrentCell;
-            if (metroGrid1.SelectedRows != null)
+            string[] fileNames = GetSelectedItemsPath();
+            if (fileNames.Any())
             {
-                var name = metroGrid1.Rows[cell.RowIndex].Cells[0].Value.ToString();
-                string[] fileNames = { string.Format(@"{0}\{1}", currentDirectory, name) };
                 IDataObject data = new DataObject(DataFormats.FileDrop, fileNames);
                 byte[] bs = new byte[] { (byte)DragDropEffects.Move, 0, 0, 0 };
                 MemoryStream ms = new MemoryStream(bs);
@@ -496,13 +616,11 @@ namespace VRCSSTweaks
         {
             try
             {
-                var cell = metroGrid1.CurrentCell;
-                if (metroGrid1.SelectedRows != null)
+                var items = GetSelectedItemsPath();
+                if (items.Any())
                 {
-                    var name = metroGrid1.Rows[cell.RowIndex].Cells[0].Value.ToString();
-                    var path = string.Format(@"{0}\{1}", currentDirectory, name);
-                    var isFolder = metroGrid1.Rows[cell.RowIndex].Cells[3].Value.ToString().Split(',').Contains("Folder");
-                    if (!isFolder)
+                    var path = items.First();
+                    if (!IsFolder(path))
                         path = Path.GetDirectoryName(path);
                     PasteFile(path);
 
@@ -551,15 +669,21 @@ namespace VRCSSTweaks
                     var withTags = containTagList.ContainsKey(sha);
                     string[] tagData = null;
                     if (withTags)
-                        tagData = containTagList[sha].ToArray();
+                        tagData = containTagList[sha].TagItems.ToArray();
                     if (type == 2)
                     {
                         if (Path.GetDirectoryName(src) == currentDirectory)
                         {
                             var fileName = Path.GetFileName(src);
-                            var index = rawFileItems.IndexOf(fileItems.FirstOrDefault(n => n.Name == fileName));
+                            var index = GetFileItemsList().IndexOf(fileItems.FirstOrDefault(n => n.Name == fileName));
                             if (index >= 0)
-                                rawFileItems.RemoveAt(index);
+                                GetFileItemsList().RemoveAt(index);
+                            if (metroCheckBox1.Checked)
+                            {
+                                index = rawFileItems.IndexOf(fileItems.FirstOrDefault(n => n.Name == fileName));
+                                if (index >= 0)
+                                    rawFileItems.RemoveAt(index);
+                            }
                             UpdateFileList();
                         }
                         if (withTags)
@@ -571,9 +695,9 @@ namespace VRCSSTweaks
                         if (tagData != null)
                         {
                             if (containTagList.ContainsKey(newSHA))
-                                containTagList.Add(newSHA, tagData.ToList());
+                                containTagList.Add(newSHA, new FilePathTagList() { TagItems = tagData.ToList(), FilePath = dest });
                             else
-                                containTagList[newSHA] = tagData.ToList();
+                                containTagList[newSHA].TagItems = tagData.ToList();
                         }
                         if (Path.GetDirectoryName(dest) == currentDirectory)
                         {
@@ -585,7 +709,7 @@ namespace VRCSSTweaks
                                 fileItem.Size = new FileSize(-1);
                                 fileItem.Date = dirInfo.LastWriteTime.ToString();
                                 fileItem.AddTag("Folder");
-                                rawFileItems.Add(fileItem);
+                                GetFileItemsList().Add(fileItem);
                             }
                             else
                             {
@@ -595,9 +719,9 @@ namespace VRCSSTweaks
                                 fileItem.Size = new FileSize(info);
                                 fileItem.Date = info.LastWriteTime.ToString();
                                 if (containTagList.ContainsKey(newSHA))
-                                    foreach (var tag in containTagList[newSHA])
+                                    foreach (var tag in containTagList[newSHA].TagItems)
                                         fileItem.AddTag(tag);
-                                rawFileItems.Add(fileItem);
+                                GetFileItemsList().Add(fileItem);
                             }
                             UpdateFileList();
                         }
@@ -743,6 +867,42 @@ namespace VRCSSTweaks
             {
                 sortColumn.HeaderCell.SortGlyphDirection = sortOrder;
             }
+        }
+        private bool IsFolder(string path)
+        {
+            return GetAttr(path) == "Directory";
+        }
+
+        private string GetAttr(string path)
+        {
+            FileAttributes attr;
+            string result;
+            try
+            {
+                attr = File.GetAttributes(path);
+                if ((attr & FileAttributes.Directory) == FileAttributes.Directory)
+                {
+                    result = "Directory";
+                }
+                else if ((attr & FileAttributes.Archive) == FileAttributes.Archive)
+                {
+                    result = "Archive";
+                }
+                else if ((attr & FileAttributes.Normal) == FileAttributes.Normal)
+                {
+                    result = "File";
+                }
+                else
+                {
+                    result = "Unknown";
+                }
+            }
+            catch (Exception)
+            {
+                result = "Error";
+            }
+
+            return result;
         }
     }
 }

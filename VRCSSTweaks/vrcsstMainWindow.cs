@@ -47,7 +47,7 @@ namespace VRCSSTweaks
 
         private FileSystemWatcher fileSystemWatcher = null;
         private FileSystemWatcher newSSMoverWatcher = null;
-        private Dictionary<string, List<string>> containTagList = new Dictionary<string, List<string>>();
+        private Dictionary<string, FilePathTagList> containTagList = new Dictionary<string, FilePathTagList>();
         private SortableBindingList<TagItem> tagItems = new SortableBindingList<TagItem>();
         private SortableBindingList<TagItem> hashTagItems = new SortableBindingList<TagItem>();
         private BindingSource fileListBindingSource = new BindingSource();
@@ -68,6 +68,7 @@ namespace VRCSSTweaks
         public vrcsstMainWindow()
         {
             InitializeComponent();
+            metroPanel29.Width = 0;
             Environment.CurrentDirectory = Path.GetDirectoryName(Application.ExecutablePath);
             Directory.SetCurrentDirectory(Environment.CurrentDirectory);
 
@@ -103,7 +104,6 @@ namespace VRCSSTweaks
             newSSMoverWatcher.SynchronizingObject = this;
             newSSMoverWatcher.Created += new FileSystemEventHandler(newSSMoverWatcher_Changed);
             newSSMoverWatcher.Changed += new FileSystemEventHandler(newSSMoverWatcher_Changed);
-            newSSMoverWatcher.Created += new FileSystemEventHandler(newSSMoverWatcher_Changed);
             //newSSMoverWatcher.Deleted += new FileSystemEventHandler(newSSMoverWatcher_Changed);
             newSSMoverWatcher.EnableRaisingEvents = true;
             if (toggleUseDarkMode.Checked)
@@ -114,6 +114,32 @@ namespace VRCSSTweaks
             this.components.SetDefaultStyle(this, metroStyleManager1.Style);
             this.components.SetDefaultTheme(this, metroStyleManager1.Theme);
             this.StyleManager = metroStyleManager1;
+            metroCheckBox1.Enabled = false;
+            Task.Factory.StartNew(() => 
+            {
+
+                var shaList = Directory.GetFiles(GetSSFolderPath(), "*.png", SearchOption.AllDirectories).ToDictionary(n => GetSHA256(n));
+                var count = containTagList.Count();
+                var keys = containTagList.Keys.ToList();
+                for(int i = 0; i < count; ++i)
+                {
+                    if (shaList.ContainsKey(keys[i]))
+                    {
+                        containTagList[keys[i]].FilePath = shaList[keys[i]];
+                    }
+                    else
+                    {
+                        containTagList.Remove(keys[i]);
+                        keys.RemoveAt(i);
+                        --count;
+                        --i;
+                    }
+                }
+                this.Invoke((MethodInvoker)(() =>
+                {
+                    metroCheckBox1.Enabled = true;
+                }));
+            });
 
         }
 
@@ -135,6 +161,13 @@ namespace VRCSSTweaks
 
                 }
             }
+        }
+        private List<FileItem> GetFileItemsList()
+        {
+            if (metroCheckBox1.Checked && tempFileItems != null)
+                return tempFileItems;
+            else
+                return rawFileItems;
         }
         private bool IsSSFolderLinked()
         {
@@ -201,6 +234,7 @@ namespace VRCSSTweaks
                         if (!Directory.Exists(directoryPath))
                             Directory.CreateDirectory(directoryPath);
                         File.Move(path, newPath);
+                        path = newPath;
                         lastFilePath = newPath;
                         LoadRecentlyImage(newPath);
                         if (windowTabControl.SelectedIndex == 0)
@@ -208,13 +242,19 @@ namespace VRCSSTweaks
                         if (GetSSFolderPath() == currentDirectory)
                         {
                             var dirInfo = new DirectoryInfo(directoryPath);
-                            var fileItem = new FileItem();
-                            fileItem.Name = dirInfo.Name;
-                            fileItem.Size = new FileSize(-1);
-                            fileItem.Date = dirInfo.LastWriteTime.ToString();
-                            var sha256 = GetSHA256(newPath);
-                            fileItem.AddTag("Folder");
-                            rawFileItems.Add(fileItem);
+                            if(!GetFileItemsList().Any(n => n.Name == dirInfo.Name && n.Tags.Contains("Folder")))
+                            {
+                                var fileItem = new FileItem();
+                                fileItem.Name = dirInfo.Name;
+                                fileItem.Size = new FileSize(-1);
+                                fileItem.Date = dirInfo.LastWriteTime.ToString();
+                                var sha256 = GetSHA256(newPath);
+                                fileItem.AddTag("Folder");
+                                GetFileItemsList().Add(fileItem);
+                                if (!metroCheckBox1.Checked)
+                                    fileItems.Add(fileItem);
+                                SortRows(metroGrid1.SortedColumn, false);
+                            }
                         }
                         else if (Path.GetDirectoryName(newPath) == currentDirectory)
                         {
@@ -226,10 +266,13 @@ namespace VRCSSTweaks
                             var sha256 = GetSHA256(newPath);
                             if (containTagList.ContainsKey(sha256))
                             {
-                                foreach (var v in containTagList[sha256])
+                                foreach (var v in containTagList[sha256].TagItems)
                                     fileItem.AddTag(v);
                             }
-                            rawFileItems.Add(fileItem);
+                            GetFileItemsList().Add(fileItem);
+                            if (!metroCheckBox1.Checked)
+                                fileItems.Add(fileItem);
+                            SortRows(metroGrid1.SortedColumn, false);
                         }
                         if (toggleNewSSToQueue.Checked)
                         {
@@ -237,7 +280,7 @@ namespace VRCSSTweaks
                             if (windowTabControl.SelectedIndex == 2)
                                 ReloadQueueImages();
                         }
-                        UpdateFileList();
+                        //UpdateFileList();
                         return;
                     }
                     catch
@@ -262,10 +305,10 @@ namespace VRCSSTweaks
                     var sha256 = GetSHA256(path);
                     if (containTagList.ContainsKey(sha256))
                     {
-                        foreach (var v in containTagList[sha256])
+                        foreach (var v in containTagList[sha256].TagItems)
                             fileItem.AddTag(v);
                     }
-                    rawFileItems.Add(fileItem);
+                    GetFileItemsList().Add(fileItem);
                 }
             }
         }
@@ -335,14 +378,68 @@ namespace VRCSSTweaks
                         listViewTweetImage.BackColor = this.BackColor;
                         listViewTweetQueue.BackColor = this.BackColor;
                         CheckNewMessage();
-                        if (toggleSortSS.Checked)
-                            SortScreenshot(true);
-                        else if (toggleCompression.Checked && lastCompressDate != DateTime.Now.Day)
-                            CompressScrenshot();
+                        if (IsSSFolderLinked())
+                        {
+                            var srcPath = Environment.GetFolderPath(Environment.SpecialFolder.MyPictures) + "\\VRChat";
+                            var destPath = textBoxSSFolder.Text;
+                            LoadPreviewImage(null);
+                            LoadRecentlyImage(null);
+                            var files = Directory.GetFiles(srcPath, "*.png", SearchOption.AllDirectories);
+                            var dialog = new ProgressWindow(metroStyleManager1);
+                            dialog.Title = "スクリーンショット移動中...";
+                            dialog.MaxValue = files.Length;
+                            dialog.Owner = this;
+                            dialog.Show();
+                            Task.Factory.StartNew(() =>
+                            {
+                                this.Invoke((MethodInvoker)(() =>
+                                {
+                                    windowTabControl.Enabled = false;
+                                }));
+                                foreach (var path in files)
+                                {
+                                    try
+                                    {
+                                        var folderName = Path.GetDirectoryName(path).Replace(srcPath, "");
+                                        var directoryPath = GetSSFolderPath() + folderName;
+                                        if (!Directory.Exists(directoryPath))
+                                            Directory.CreateDirectory(directoryPath);
+                                        File.Move(path, directoryPath + "\\" + Path.GetFileName(path));
+                                    }
+                                    catch
+                                    {
+                                    }
+                                    dialog.Invoke((MethodInvoker)(() => ++dialog.CurrentValue));
+                                }
+                                dialog.Invoke((MethodInvoker)(() => dialog.Close()));
+
+                                this.Invoke((MethodInvoker)(() =>
+                                {
+                                    windowTabControl.Enabled = true;
+                                    var lastImage = Directory.GetFiles(GetSSFolderPath(), "*.png", SearchOption.TopDirectoryOnly).OrderByDescending(n => File.GetLastWriteTime(n).Ticks).FirstOrDefault();
+                                    if (toggleSortSS.Checked)
+                                        SortScreenshot(true);
+                                    else if (toggleCompression.Checked && lastCompressDate != DateTime.Now.Day)
+                                        CompressScrenshot();
+                                    else
+                                        fileListRefresher.RunWorkerAsync();
+                                    if (toggleStartWithMinimized.Checked)
+                                        WindowState = FormWindowState.Minimized;
+                                }));
+
+                            });
+                        }
                         else
-                            fileListRefresher.RunWorkerAsync();
-                        if (toggleStartWithMinimized.Checked)
-                            WindowState = FormWindowState.Minimized;
+                        {
+                            if (toggleSortSS.Checked)
+                                SortScreenshot(true);
+                            else if (toggleCompression.Checked && lastCompressDate != DateTime.Now.Day)
+                                CompressScrenshot();
+                            else
+                                fileListRefresher.RunWorkerAsync();
+                            if (toggleStartWithMinimized.Checked)
+                                WindowState = FormWindowState.Minimized;
+                        }
                     }));
                 });
             }
@@ -510,7 +607,7 @@ namespace VRCSSTweaks
                 var tags = element.Value.Split(',').ToList();
                 foreach (var v in tags.Where(tagName => !tagItems.Any(tagItem => tagItem.Name == tagName)))
                     tagItems.Add(new TagItem() { Name = v });
-                containTagList.Add(element.Name.LocalName.Replace("SHA256_", ""), tags);
+                containTagList.Add(element.Name.LocalName.Replace("SHA256_", ""), new FilePathTagList() { TagItems = tags });
             }
         }
         private void SaveTags()
@@ -519,7 +616,7 @@ namespace VRCSSTweaks
             var xmlFile = new XElement("VRCSSTTags");
             foreach (var tagData in containTagList)
             {
-                xmlFile.Add(new XElement("SHA256_" + tagData.Key, string.Join(",", tagData.Value)));
+                xmlFile.Add(new XElement("SHA256_" + tagData.Key, string.Join(",", tagData.Value.TagItems)));
             }
             xmlFile.Save(path);
         }
@@ -660,7 +757,7 @@ namespace VRCSSTweaks
                 var name = tagItems[rowIndex].Name;
                 tagItems.RemoveAt(rowIndex);
                 foreach (var v in containTagList.Values)
-                    v.Remove(name);
+                    v.TagItems.Remove(name);
                 foreach (var v in rawFileItems)
                     v.RemoveTag(name);
                 PoseFileList();
@@ -678,7 +775,7 @@ namespace VRCSSTweaks
                 LoadTagsData(GetSHA256(lastFilePath));
             else if (windowTabControl.SelectedIndex == 1)
             {
-                LoadTagsData(currentPreviewImageSHA256);
+                LoadTagsData(GetSHA256(currentPreviewImagePath));
                 RefreshFileListTags();
             }
             else if(windowTabControl.SelectedIndex == 2)
@@ -801,6 +898,16 @@ namespace VRCSSTweaks
         private void 終了ToolStripMenuItem_Click(object sender, EventArgs e)
         {
             Application.Exit();
+        }
+
+        private void metroPanel1_Paint(object sender, PaintEventArgs e)
+        {
+
+        }
+
+        private void metroScrollBar1_Scroll(object sender, ScrollEventArgs e)
+        {
+
         }
     }
 }
