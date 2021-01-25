@@ -68,22 +68,20 @@ namespace VRCSSTweaks
         public vrcsstMainWindow()
         {
             InitializeComponent();
-            metroPanel29.Width = 0;
             Environment.CurrentDirectory = Path.GetDirectoryName(Application.ExecutablePath);
             Directory.SetCurrentDirectory(Environment.CurrentDirectory);
 
-            comboBoxCompressMethod.SelectedIndex = 1;
-            comboBoxCompressLevel.SelectedIndex = 9;
-            textBoxCompressDays.Text = "180";
             windowTabControl.SelectedIndex = 0;
-            comboBoxMinButtonMode.SelectedIndex = 0;
-            comboBoxCloseButtonMode.SelectedIndex = 2;
 
             //Load XML
             LoadConfig();
             LoadTags();
             LoadKeys();
 
+            if (!Directory.Exists(settingsFolderLinkSrc.FilePath))
+                settingsFolderLinkSrc.FilePath = Environment.GetFolderPath(Environment.SpecialFolder.MyPictures) + "\\VRChat";
+            if (!Directory.Exists(settingsFolderLinkSrc.FilePath))
+                Directory.CreateDirectory(Environment.GetFolderPath(Environment.SpecialFolder.MyPictures) + "\\VRChat");
 
             CheckSSFolderIsExist();
 
@@ -98,7 +96,7 @@ namespace VRCSSTweaks
             fileSystemWatcher.EnableRaisingEvents = true;
 
             newSSMoverWatcher = new FileSystemWatcher();
-            newSSMoverWatcher.Path = Environment.GetFolderPath(Environment.SpecialFolder.MyPictures) + "\\VRChat";
+            newSSMoverWatcher.Path = settingsFolderLinkSrc.FilePath;
             newSSMoverWatcher.NotifyFilter = NotifyFilters.LastWrite;
             newSSMoverWatcher.Filter = "*.png";
             newSSMoverWatcher.SynchronizingObject = this;
@@ -106,7 +104,7 @@ namespace VRCSSTweaks
             newSSMoverWatcher.Changed += new FileSystemEventHandler(newSSMoverWatcher_Changed);
             //newSSMoverWatcher.Deleted += new FileSystemEventHandler(newSSMoverWatcher_Changed);
             newSSMoverWatcher.EnableRaisingEvents = true;
-            if (toggleUseDarkMode.Checked)
+            if (settingsUseDarkMode.Checked)
                 metroStyleManager1.Theme = MetroThemeStyle.Dark;
             else
                 metroStyleManager1.Theme = MetroThemeStyle.Light;
@@ -171,20 +169,20 @@ namespace VRCSSTweaks
         }
         private bool IsSSFolderLinked()
         {
-            var srcPath = Environment.GetFolderPath(Environment.SpecialFolder.MyPictures) + "\\VRChat";
-            var destPath = textBoxSSFolder.Text;
+            var srcPath = settingsFolderLinkSrc.FilePath;
+            var destPath = settingsFolderLinkDest.FilePath;
             return (!string.IsNullOrEmpty(destPath) && destPath != srcPath);
         }
         private void CheckSSFolderIsExist()
         {
-            if (!Directory.Exists(Environment.GetFolderPath(Environment.SpecialFolder.MyPictures) + "\\VRChat"))
+            if (!Directory.Exists(settingsFolderLinkSrc.FilePath))
             {
                 MessageBox.Show("VRChatのスクリーンショットフォルダが見つかりません\nマイピクチャ内にVRChatフォルダが存在していることを確認してください");
                 Application.Exit();
             }
             if (IsSSFolderLinked())
             {
-                var destPath = textBoxSSFolder.Text;
+                var destPath = settingsFolderLinkDest.FilePath;
                 try
                 {
                     if(!Directory.Exists(destPath))
@@ -195,7 +193,7 @@ namespace VRCSSTweaks
                 catch
                 {
                     MessageBox.Show("リンクフォルダにアクセスできませんでした");
-                    textBoxSSFolder.Text = "";
+                    settingsFolderLinkDest.FilePath = "";
                 }
             }
         }
@@ -203,9 +201,9 @@ namespace VRCSSTweaks
         {
             CheckSSFolderIsExist();
             if (IsSSFolderLinked())
-                return textBoxSSFolder.Text;
+                return settingsFolderLinkDest.FilePath;
             
-            return Environment.GetFolderPath(Environment.SpecialFolder.MyPictures) + "\\VRChat";
+            return settingsFolderLinkSrc.FilePath;
         }
         IEnumerable<int> waitCounter = Enumerable.Range(0, 50);
         private void fileSystemWatcher_Changed(object sender, FileSystemEventArgs e)
@@ -220,12 +218,12 @@ namespace VRCSSTweaks
                     break;
                 Task.Delay(100).Wait();
             }
-            if (!toggleObserveRunningVRC.Checked || CheckIsVRCRunning())
+            if (!settingsRunWithVRC.Checked || CheckIsVRCRunning())
             {
-                if (toggleSortSS.Checked)
+                if (settingsSortSS.Checked)
                 {
                     var info = new FileInfo(path);
-                    var date = info.CreationTime - TimeSpan.FromHours(int.Parse(textBoxBorderHour.Text));
+                    var date = info.CreationTime - TimeSpan.FromHours(settingsBorderHour.Value);
                     var folderName = string.Format("{0}-{1:D2}-{2:D2}", date.Year, date.Month, date.Day);
                     var directoryPath = GetSSFolderPath() + "\\" + folderName;
                     var newPath = directoryPath + "\\" + Path.GetFileName(path);
@@ -274,7 +272,7 @@ namespace VRCSSTweaks
                                 fileItems.Add(fileItem);
                             SortRows(metroGrid1.SortedColumn, false);
                         }
-                        if (toggleNewSSToQueue.Checked)
+                        if (settingsNewSSToQueue.Checked)
                         {
                             RegisterToImageQueue(newPath);
                             if (windowTabControl.SelectedIndex == 2)
@@ -287,7 +285,7 @@ namespace VRCSSTweaks
                     {
                     }
                 }
-                if (toggleNewSSToQueue.Checked)
+                if (settingsNewSSToQueue.Checked)
                 {
                     RegisterToImageQueue(path);
                     if (windowTabControl.SelectedIndex == 2)
@@ -354,7 +352,7 @@ namespace VRCSSTweaks
                 }
 
                 //監視を開始する
-                fileSystemWatcher.EnableRaisingEvents = toggleObserveSS.Checked;
+                fileSystemWatcher.EnableRaisingEvents = settingsObserveSS.Checked;
                 fileListBindingSource.DataSource = fileItems;
                 metroGrid1.DataSource = fileListBindingSource;
                 gridPRSSTagList.AutoGenerateColumns = false;
@@ -380,8 +378,8 @@ namespace VRCSSTweaks
                         CheckNewMessage();
                         if (IsSSFolderLinked())
                         {
-                            var srcPath = Environment.GetFolderPath(Environment.SpecialFolder.MyPictures) + "\\VRChat";
-                            var destPath = textBoxSSFolder.Text;
+                            var srcPath = settingsFolderLinkSrc.FilePath;
+                            var destPath = settingsFolderLinkDest.FilePath;
                             LoadPreviewImage(null);
                             LoadRecentlyImage(null);
                             var files = Directory.GetFiles(srcPath, "*.png", SearchOption.AllDirectories);
@@ -417,13 +415,13 @@ namespace VRCSSTweaks
                                 {
                                     windowTabControl.Enabled = true;
                                     var lastImage = Directory.GetFiles(GetSSFolderPath(), "*.png", SearchOption.TopDirectoryOnly).OrderByDescending(n => File.GetLastWriteTime(n).Ticks).FirstOrDefault();
-                                    if (toggleSortSS.Checked)
+                                    if (settingsSortSS.Checked)
                                         SortScreenshot(true);
-                                    else if (toggleCompression.Checked && lastCompressDate != DateTime.Now.Day)
+                                    else if (settingsUseCompress.Checked && lastCompressDate != DateTime.Now.Day)
                                         CompressScrenshot();
                                     else
                                         fileListRefresher.RunWorkerAsync();
-                                    if (toggleStartWithMinimized.Checked)
+                                    if (settingsStartWithMinimized.Checked)
                                         WindowState = FormWindowState.Minimized;
                                 }));
 
@@ -431,13 +429,13 @@ namespace VRCSSTweaks
                         }
                         else
                         {
-                            if (toggleSortSS.Checked)
+                            if (settingsSortSS.Checked)
                                 SortScreenshot(true);
-                            else if (toggleCompression.Checked && lastCompressDate != DateTime.Now.Day)
+                            else if (settingsUseCompress.Checked && lastCompressDate != DateTime.Now.Day)
                                 CompressScrenshot();
                             else
                                 fileListRefresher.RunWorkerAsync();
-                            if (toggleStartWithMinimized.Checked)
+                            if (settingsStartWithMinimized.Checked)
                                 WindowState = FormWindowState.Minimized;
                         }
                     }));
@@ -482,7 +480,7 @@ namespace VRCSSTweaks
         {
             if (WindowState != FormWindowState.Minimized)
                 return;
-            var index = minimizeWithCloseButton ? comboBoxCloseButtonMode.SelectedIndex : comboBoxMinButtonMode.SelectedIndex;
+            var index = minimizeWithCloseButton ? settingsCloseButtonMode.SelectedIndex : settingsMinButtonMode.SelectedIndex;
             if (index == 0)
             {
                 Visible = false;
@@ -503,7 +501,7 @@ namespace VRCSSTweaks
         }
         private void vrcsstMainWindow_FormClosing(object sender, FormClosingEventArgs e)
         {
-            if (comboBoxCloseButtonMode.SelectedIndex != 2 && e.CloseReason == CloseReason.UserClosing)
+            if (settingsCloseButtonMode.SelectedIndex != 2 && e.CloseReason == CloseReason.UserClosing)
             {
                 minimizeWithCloseButton = true;
                 e.Cancel = true;
@@ -533,32 +531,32 @@ namespace VRCSSTweaks
             var xmlFile = XElement.Load(path);
             var vrcSSTSettings = xmlFile;
 
-            textBoxSSFolder.Text = (string)GetConfigValue(vrcSSTSettings, "LinkedSSPath", textBoxSSFolder.Text, typeof(string));
-
-            toggleObserveSS.Checked = (bool)GetConfigValue(vrcSSTSettings, "ObserveScreenShot", toggleObserveSS.Checked, typeof(bool));
-            toggleObserveRunningVRC.Checked = (bool)GetConfigValue(vrcSSTSettings, "ObserveWithVRCRunning", toggleObserveRunningVRC.Checked, typeof(bool));
-            toggleDetectBarcode.Checked = (bool)GetConfigValue(vrcSSTSettings, "DetectBarcode", toggleDetectBarcode.Checked, typeof(bool));
-            toggleOpenBarcode.Checked = (bool)GetConfigValue(vrcSSTSettings, "AutoOpenBarcode", toggleOpenBarcode.Checked, typeof(bool));
-            toggleSortSS.Checked = (bool)GetConfigValue(vrcSSTSettings, "SortScreenShot", toggleSortSS.Checked, typeof(bool));
-            toggleStartup.Checked = (bool)GetConfigValue(vrcSSTSettings, "StartupApp", toggleStartup.Checked, typeof(bool));
+            settingsFolderLinkDest.FilePath = (string)GetConfigValue(vrcSSTSettings, "LinkedSSPath", settingsFolderLinkDest.FilePath, typeof(string));
+            settingsFolderLinkSrc.FilePath = (string)GetConfigValue(vrcSSTSettings, "SourceSSPath", settingsFolderLinkSrc.FilePath, typeof(string));
+            settingsObserveSS.Checked = (bool)GetConfigValue(vrcSSTSettings, "ObserveScreenShot", settingsObserveSS.Checked, typeof(bool));
+            settingsRunWithVRC.Checked = (bool)GetConfigValue(vrcSSTSettings, "ObserveWithVRCRunning", settingsRunWithVRC.Checked, typeof(bool));
+            settingsDetectBarcode.Checked = (bool)GetConfigValue(vrcSSTSettings, "DetectBarcode", settingsDetectBarcode.Checked, typeof(bool));
+            settingsOpenBarcode.Checked = (bool)GetConfigValue(vrcSSTSettings, "AutoOpenBarcode", settingsOpenBarcode.Checked, typeof(bool));
+            settingsSortSS.Checked = (bool)GetConfigValue(vrcSSTSettings, "SortScreenShot", settingsSortSS.Checked, typeof(bool));
+            settingsUseStartup.Checked = (bool)GetConfigValue(vrcSSTSettings, "StartupApp", settingsUseStartup.Checked, typeof(bool));
             lastFilePath = (string)GetConfigValue(vrcSSTSettings, "LastImagePath", "", typeof(string));
-            toggleCompression.Checked = (bool)GetConfigValue(vrcSSTSettings, "EnableCompress", toggleCompression.Checked, typeof(bool));
-            comboBoxCompressMethod.SelectedIndex = (int)GetConfigValue(vrcSSTSettings, "CompressSeparateType", comboBoxCompressMethod.SelectedIndex, typeof(int));
-            comboBoxCompressLevel.SelectedIndex = (int)GetConfigValue(vrcSSTSettings, "CompressLevel", comboBoxCompressLevel.SelectedIndex, typeof(int));
-            textBoxCompressDays.Text = (string)GetConfigValue(vrcSSTSettings, "CompressDayLimit", textBoxCompressDays.Text, typeof(string));
+            settingsUseCompress.Checked = (bool)GetConfigValue(vrcSSTSettings, "EnableCompress", settingsUseCompress.Checked, typeof(bool));
+            settingsCompressMethod.SelectedIndex = (int)GetConfigValue(vrcSSTSettings, "CompressSeparateType", settingsCompressMethod.SelectedIndex, typeof(int));
+            settingsCompressLevel.SelectedIndex = (int)GetConfigValue(vrcSSTSettings, "CompressLevel", settingsCompressLevel.SelectedIndex, typeof(int));
+            settingsCompressDays.Value = (int)GetConfigValue(vrcSSTSettings, "CompressDayLimit", settingsCompressDays.Value, typeof(int));
             lastCompressDate = (byte)GetConfigValue(vrcSSTSettings, "LastCompressDate", lastCompressDate, typeof(byte));
             accessToken = (string)GetConfigValue(vrcSSTSettings, "AccessToken", accessToken, typeof(string));
             accessSecret = (string)GetConfigValue(vrcSSTSettings, "AccessTokenSecret", accessSecret, typeof(string));
             hashTagItems.Clear();
             foreach (var v in ((string)GetConfigValue(vrcSSTSettings, "HashTags", accessSecret, typeof(string))).Split(','))
             hashTagItems.Add(new TagItem() { Name = v });
-            toggleNewSSToQueue.Checked = (bool)GetConfigValue(vrcSSTSettings, "NewSSToQueue", toggleNewSSToQueue.Checked, typeof(bool));
+            settingsNewSSToQueue.Checked = (bool)GetConfigValue(vrcSSTSettings, "NewSSToQueue", settingsNewSSToQueue.Checked, typeof(bool));
             msgLastGotTime = (DateTime)GetConfigValue(vrcSSTSettings, "MessageGotTime", msgLastGotTime, typeof(DateTime));
-            textBoxBorderHour.Text = (string)GetConfigValue(vrcSSTSettings, "DayBorder", textBoxBorderHour.Text, typeof(string));
-            toggleUseDarkMode.Checked = (bool)GetConfigValue(vrcSSTSettings, "DarkMode", toggleUseDarkMode.Checked, typeof(bool));
-            toggleStartWithMinimized.Checked = (bool)GetConfigValue(vrcSSTSettings, "MinimizedStart", toggleStartWithMinimized.Checked, typeof(bool));
-            comboBoxMinButtonMode.SelectedIndex = (int)GetConfigValue(vrcSSTSettings, "MinimizeMode", comboBoxMinButtonMode.SelectedIndex, typeof(int));
-            comboBoxCloseButtonMode.SelectedIndex = (int)GetConfigValue(vrcSSTSettings, "CloseMode", comboBoxCloseButtonMode.SelectedIndex, typeof(int));
+            settingsBorderHour.Value = (int)GetConfigValue(vrcSSTSettings, "DayBorder", settingsBorderHour.Value, typeof(int));
+            settingsUseDarkMode.Checked = (bool)GetConfigValue(vrcSSTSettings, "DarkMode", settingsUseDarkMode.Checked, typeof(bool));
+            settingsStartWithMinimized.Checked = (bool)GetConfigValue(vrcSSTSettings, "MinimizedStart", settingsStartWithMinimized.Checked, typeof(bool));
+            settingsMinButtonMode.SelectedIndex = (int)GetConfigValue(vrcSSTSettings, "MinimizeMode", settingsMinButtonMode.SelectedIndex, typeof(int));
+            settingsCloseButtonMode.SelectedIndex = (int)GetConfigValue(vrcSSTSettings, "CloseMode", settingsCloseButtonMode.SelectedIndex, typeof(int));
         }
         private void LogOutput(string log)
         {
@@ -570,29 +568,30 @@ namespace VRCSSTweaks
         {
             var path = Directory.GetCurrentDirectory() + @"\config.xml";
             var xmlFile = new XElement("VRCSSTSettings");
-            xmlFile.Add(new XElement("LinkedSSPath", textBoxSSFolder.Text));
-            xmlFile.Add(new XElement("ObserveScreenShot", toggleObserveSS.Checked));
-            xmlFile.Add(new XElement("ObserveWithVRCRunning", toggleObserveRunningVRC.Checked));
-            xmlFile.Add(new XElement("DetectBarcode", toggleDetectBarcode.Checked));
-            xmlFile.Add(new XElement("AutoOpenBarcode", toggleOpenBarcode.Checked));
-            xmlFile.Add(new XElement("SortScreenShot", toggleSortSS.Checked));
-            xmlFile.Add(new XElement("StartupApp", toggleStartup.Checked));
+            xmlFile.Add(new XElement("LinkedSSPath", settingsFolderLinkDest.FilePath));
+            xmlFile.Add(new XElement("SourceSSPath", settingsFolderLinkSrc.FilePath));
+            xmlFile.Add(new XElement("ObserveScreenShot", settingsObserveSS.Checked));
+            xmlFile.Add(new XElement("ObserveWithVRCRunning", settingsRunWithVRC.Checked));
+            xmlFile.Add(new XElement("DetectBarcode", settingsDetectBarcode.Checked));
+            xmlFile.Add(new XElement("AutoOpenBarcode", settingsOpenBarcode.Checked));
+            xmlFile.Add(new XElement("SortScreenShot", settingsSortSS.Checked));
+            xmlFile.Add(new XElement("StartupApp", settingsUseStartup.Checked));
             xmlFile.Add(new XElement("LastImagePath", lastFilePath));
-            xmlFile.Add(new XElement("EnableCompress", toggleCompression.Checked));
-            xmlFile.Add(new XElement("CompressSeparateType", comboBoxCompressMethod.SelectedIndex));
-            xmlFile.Add(new XElement("CompressLevel", comboBoxCompressLevel.SelectedIndex));
-            xmlFile.Add(new XElement("CompressDayLimit", textBoxCompressDays.Text));
+            xmlFile.Add(new XElement("EnableCompress", settingsUseCompress.Checked));
+            xmlFile.Add(new XElement("CompressSeparateType", settingsCompressMethod.SelectedIndex));
+            xmlFile.Add(new XElement("CompressLevel", settingsCompressLevel.SelectedIndex));
+            xmlFile.Add(new XElement("CompressDayLimit", settingsCompressDays.Value));
             xmlFile.Add(new XElement("LastCompressDate", lastCompressDate));
             xmlFile.Add(new XElement("AccessToken", accessToken));
             xmlFile.Add(new XElement("AccessTokenSecret", accessSecret));
             xmlFile.Add(new XElement("HashTags", string.Join(",", hashTagItems.Select(n => n.Name))));
-            xmlFile.Add(new XElement("NewSSToQueue", toggleNewSSToQueue.Checked));
+            xmlFile.Add(new XElement("NewSSToQueue", settingsNewSSToQueue.Checked));
             xmlFile.Add(new XElement("MessageGotTime", msgLastGotTime));
-            xmlFile.Add(new XElement("DayBorder", textBoxBorderHour.Text));
-            xmlFile.Add(new XElement("DarkMode", toggleUseDarkMode.Checked));
-            xmlFile.Add(new XElement("MinimizedStart", toggleStartWithMinimized.Checked));
-            xmlFile.Add(new XElement("MinimizeMode", comboBoxMinButtonMode.SelectedIndex));
-            xmlFile.Add(new XElement("CloseMode", comboBoxCloseButtonMode.SelectedIndex));
+            xmlFile.Add(new XElement("DayBorder", settingsBorderHour.Value));
+            xmlFile.Add(new XElement("DarkMode", settingsUseDarkMode.Checked));
+            xmlFile.Add(new XElement("MinimizedStart", settingsStartWithMinimized.Checked));
+            xmlFile.Add(new XElement("MinimizeMode", settingsMinButtonMode.SelectedIndex));
+            xmlFile.Add(new XElement("CloseMode", settingsCloseButtonMode.SelectedIndex));
             xmlFile.Save(path);
         }
         private void LoadTags()
@@ -689,7 +688,7 @@ namespace VRCSSTweaks
             {
                 this.Invoke((MethodInvoker)(() =>
                 {
-                    toggleSortSS.Enabled = false;
+                    settingsSortSS.Enabled = false;
                     windowTabControl.Enabled = false;
                 }));
                 foreach (var path in files)
@@ -713,11 +712,11 @@ namespace VRCSSTweaks
 
                 this.Invoke((MethodInvoker)(() =>
                 {
-                    if (compressAfter && toggleCompression.Checked && lastCompressDate != DateTime.Now.Day)
+                    if (compressAfter && settingsUseCompress.Checked && lastCompressDate != DateTime.Now.Day)
                         CompressScrenshot();
                     else
                     {
-                        toggleSortSS.Enabled = true;
+                        settingsSortSS.Enabled = true;
                         windowTabControl.Enabled = true;
                         LoadRecentlyImage(lastFilePath);
                         fileListRefresher.RunWorkerAsync();
@@ -794,21 +793,21 @@ namespace VRCSSTweaks
             dialog.MaxValue = files.Length;
             dialog.Owner = this;
             dialog.Show();
-            var bindmode = comboBoxCompressMethod.SelectedIndex;
-            var levelIndex = comboBoxCompressLevel.SelectedIndex;
+            var bindmode = settingsCompressMethod.SelectedIndex;
+            var levelIndex = settingsCompressLevel.SelectedIndex;
             var level = (CompressionLevel)levelIndex;
-            Console.WriteLine(comboBoxCompressLevel.SelectedIndex);
+            Console.WriteLine(settingsCompressLevel.SelectedIndex);
             Console.WriteLine(level);
             Task.Factory.StartNew(() =>
             {
                 this.Invoke((MethodInvoker)(() => 
                 {
-                    toggleCompression.Enabled = false;
+                    settingsUseCompress.Enabled = false;
                     windowTabControl.Enabled = false;
                 }));
                 ZipFile zip = null;
                 var currentZipFile = "";
-                var limit = int.Parse(textBoxCompressDays.Text);
+                var limit = settingsCompressDays.Value;
                 long byteCount = 0;
                 var deletePath = new List<string>();
                 if (!Directory.Exists(GetSSFolderPath() + "\\Archives"))
@@ -877,7 +876,7 @@ namespace VRCSSTweaks
                 dialog.Invoke((MethodInvoker)(() => dialog.Close()));
                 this.Invoke((MethodInvoker)(() =>
                 {
-                    toggleCompression.Enabled = true;
+                    settingsUseCompress.Enabled = true;
                     windowTabControl.Enabled = true;
                     LoadRecentlyImage(lastFilePath); 
                     fileListRefresher.RunWorkerAsync();
@@ -888,7 +887,7 @@ namespace VRCSSTweaks
 
         private void dayChangeDetector_Tick(object sender, EventArgs e)
         {
-            if (toggleCompression.Enabled && lastCompressDate != DateTime.Now.Day)
+            if (settingsUseCompress.Enabled && lastCompressDate != DateTime.Now.Day)
             {
                 CheckNewMessage();
                 CompressScrenshot();
@@ -900,12 +899,37 @@ namespace VRCSSTweaks
             Application.Exit();
         }
 
-        private void metroPanel1_Paint(object sender, PaintEventArgs e)
+        private void settingsFolderLinkSrc_FilePathChanged(object sender, EventArgs e)
         {
 
         }
 
-        private void metroScrollBar1_Scroll(object sender, ScrollEventArgs e)
+        private void toggleCompression_CheckedChanged(object sender, EventArgs e)
+        {
+
+        }
+
+        private void toggleUseDarkMode_CheckedChanged(object sender, EventArgs e)
+        {
+
+        }
+
+        private void toggleStartup_CheckedChanged(object sender, EventArgs e)
+        {
+
+        }
+
+        private void toggleSortSS_CheckedChanged(object sender, EventArgs e)
+        {
+
+        }
+
+        private void toggleObserveSS_CheckedChanged(object sender, EventArgs e)
+        {
+
+        }
+
+        private void textBoxSSFolder_TextChanged(object sender, EventArgs e)
         {
 
         }

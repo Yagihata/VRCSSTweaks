@@ -72,6 +72,7 @@
     <Reference Include="MetroFramework.Fonts, Version=1.4.0.0, Culture=neutral, PublicKeyToken=5f91a84759bf584a, processorArchitecture=MSIL">
       <HintPath>..\packages\MetroModernUI.1.4.0.0\lib\net\MetroFramework.Fonts.dll</HintPath>
     </Reference>
+    <Reference Include="Microsoft.VisualBasic.Compatibility.Data" />
     <Reference Include="Microsoft.WindowsAPICodePack, Version=1.1.2.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\WindowsAPICodePack-Core.1.1.2\lib\Microsoft.WindowsAPICodePack.dll</HintPath>
     </Reference>
@@ -122,6 +123,30 @@
     <Compile Include="NewMessageWindow.Designer.cs">
       <DependentUpon>NewMessageWindow.cs</DependentUpon>
     </Compile>
+    <Compile Include="SettingsRows\SettingsRowComboBox.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="SettingsRows\SettingsRowComboBox.Designer.cs">
+      <DependentUpon>SettingsRowComboBox.cs</DependentUpon>
+    </Compile>
+    <Compile Include="SettingsRows\SettingsRowNumField.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="SettingsRows\SettingsRowNumField.Designer.cs">
+      <DependentUpon>SettingsRowNumField.cs</DependentUpon>
+    </Compile>
+    <Compile Include="SettingsRows\SettingsRowToggle.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="SettingsRows\SettingsRowToggle.Designer.cs">
+      <DependentUpon>SettingsRowToggle.cs</DependentUpon>
+    </Compile>
+    <Compile Include="SettingsRows\SettingsRowFilePicker.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="SettingsRows\SettingsRowFilePicker.Designer.cs">
+      <DependentUpon>SettingsRowFilePicker.cs</DependentUpon>
+    </Compile>
     <Compile Include="vrcsstMainWindow.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -158,6 +183,18 @@
     <EmbeddedResource Include="NewMessageWindow.resx">
       <DependentUpon>NewMessageWindow.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="SettingsRows\SettingsRowComboBox.resx">
+      <DependentUpon>SettingsRowComboBox.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="SettingsRows\SettingsRowNumField.resx">
+      <DependentUpon>SettingsRowNumField.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="SettingsRows\SettingsRowToggle.resx">
+      <DependentUpon>SettingsRowToggle.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="SettingsRows\SettingsRowFilePicker.resx">
+      <DependentUpon>SettingsRowFilePicker.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="vrcsstMainWindow.resx">
       <DependentUpon>vrcsstMainWindow.cs</DependentUpon>
     </EmbeddedResource>
@@ -174,6 +211,9 @@
       <DependentUpon>Resources.resx</DependentUpon>
       <DesignTime>True</DesignTime>
     </Compile>
+    <None Include="..\.editorconfig">
+      <Link>.editorconfig</Link>
+    </None>
     <None Include="packages.config" />
     <None Include="Properties\DataSources\FileItem.datasource" />
     <None Include="Properties\DataSources\TagItem.datasource" />

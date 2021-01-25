@@ -1,0 +1,4 @@
+﻿[*.cs]
+
+# CS0414: フィールド 'DGVCC_FilePickerEditingControl.valueChanged' が割り当てられていますが、値は使用されていません。
+dotnet_diagnostic.CS0414.severity = silent

@@ -18,7 +18,7 @@ namespace VRCSSTweaks
 
         private void toggleStartup_CheckedChanged(object sender, EventArgs e)
         {
-            if (toggleStartup.Checked)
+            if (settingsUseStartup.Checked)
             {
                 RegistryKey regkey = Registry.CurrentUser.OpenSubKey(@"Software\Microsoft\Windows\CurrentVersion\Run", true);
                 regkey.SetValue(Application.ProductName, Application.ExecutablePath);
@@ -33,17 +33,69 @@ namespace VRCSSTweaks
                 regkey.Close();
             }
         }
-        private void ssFolderSelectButton_Click(object sender, EventArgs e)
+        private void settingsFolderLinkSrc_FilePathChanged(object sender, EventArgs e)
         {
-            using (var ofd = new CommonOpenFileDialog() { DefaultDirectory = textBoxSSFolder.Text, IsFolderPicker = true })
+            if (finishInit)
             {
-                if (ofd.ShowDialog() == CommonFileDialogResult.Ok)
+                CheckSSFolderIsExist();
+                if (!IsSSFolderLinked())
+                    return;
+                newSSMoverWatcher.Path = settingsFolderLinkSrc.FilePath;
+                fileSystemWatcher.Path = GetSSFolderPath();
+                currentDirectory = GetSSFolderPath();
+                if (MessageBox.Show("元フォルダ内のファイルをリンク先へ移動しますか？", "確認", MessageBoxButtons.YesNo) == DialogResult.Yes)
                 {
-                    textBoxSSFolder.Text = ofd.FileName;
+                    var srcPath = settingsFolderLinkSrc.FilePath;
+                    var destPath = settingsFolderLinkDest.FilePath;
+                    LoadPreviewImage(null);
+                    LoadRecentlyImage(null);
+                    var files = Directory.GetFiles(srcPath, "*.png", SearchOption.AllDirectories);
+                    var dialog = new ProgressWindow(metroStyleManager1);
+                    dialog.Title = "スクリーンショット移動中...";
+                    dialog.MaxValue = files.Length;
+                    dialog.Owner = this;
+                    dialog.Show();
+                    Task.Factory.StartNew(() =>
+                    {
+                        this.Invoke((MethodInvoker)(() =>
+                        {
+                            windowTabControl.Enabled = false;
+                        }));
+                        foreach (var path in files)
+                        {
+                            try
+                            {
+                                var folderName = Path.GetDirectoryName(path).Replace(srcPath, "");
+                                var directoryPath = GetSSFolderPath() + folderName;
+                                if (!Directory.Exists(directoryPath))
+                                    Directory.CreateDirectory(directoryPath);
+                                File.Move(path, directoryPath + "\\" + Path.GetFileName(path));
+                            }
+                            catch
+                            {
+                            }
+                            dialog.Invoke((MethodInvoker)(() => ++dialog.CurrentValue));
+                        }
+                        dialog.Invoke((MethodInvoker)(() => dialog.Close()));
+
+                        this.Invoke((MethodInvoker)(() =>
+                        {
+                            windowTabControl.Enabled = true;
+                            var lastImage = Directory.GetFiles(GetSSFolderPath(), "*.png", SearchOption.TopDirectoryOnly).OrderByDescending(n => File.GetLastWriteTime(n).Ticks).FirstOrDefault();
+                            LoadRecentlyImage(lastImage);
+                            fileListRefresher.RunWorkerAsync();
+                        }));
+
+                    });
+                }
+                else
+                {
+                    var lastImage = Directory.GetFiles(GetSSFolderPath(), "*.png", SearchOption.TopDirectoryOnly).OrderByDescending(n => File.GetLastWriteTime(n).Ticks).FirstOrDefault();
+                    LoadRecentlyImage(lastImage);
+                    fileListRefresher.RunWorkerAsync();
                 }
             }
         }
-
         private void textBoxSSFolder_TextChanged(object sender, EventArgs e)
         {
             if (finishInit)
@@ -51,12 +103,13 @@ namespace VRCSSTweaks
                 CheckSSFolderIsExist();
                 if (!IsSSFolderLinked())
                     return;
+                newSSMoverWatcher.Path = settingsFolderLinkSrc.FilePath;
                 fileSystemWatcher.Path = GetSSFolderPath();
                 currentDirectory = GetSSFolderPath();
                 if (MessageBox.Show("元フォルダ内のファイルをリンク先へ移動しますか？", "確認", MessageBoxButtons.YesNo) == DialogResult.Yes)
                 {
-                    var srcPath = Environment.GetFolderPath(Environment.SpecialFolder.MyPictures) + "\\VRChat";
-                    var destPath = textBoxSSFolder.Text;
+                    var srcPath = settingsFolderLinkSrc.FilePath;
+                    var destPath = settingsFolderLinkDest.FilePath;
                     LoadPreviewImage(null);
                     LoadRecentlyImage(null);
                     var files = Directory.GetFiles(srcPath, "*.png", SearchOption.AllDirectories);
@@ -107,20 +160,16 @@ namespace VRCSSTweaks
             }
         }
 
-        private void toggleDetectBarcode_CheckedChanged(object sender, EventArgs e)
-        {
-        }
-
         private void toggleObserveSS_CheckedChanged(object sender, EventArgs e)
         {
-            fileSystemWatcher.EnableRaisingEvents = toggleObserveSS.Checked;
+            fileSystemWatcher.EnableRaisingEvents = settingsObserveSS.Checked;
         }
 
         private void toggleSortSS_CheckedChanged(object sender, EventArgs e)
         {
             if (finishInit)
             {
-                if (toggleSortSS.Checked)
+                if (settingsSortSS.Checked)
                 {
                     if (MessageBox.Show("既に存在するファイルを日付分けしますか？", "確認", MessageBoxButtons.YesNo) == DialogResult.Yes)
                     {
@@ -130,19 +179,9 @@ namespace VRCSSTweaks
             }
         }
 
-        private void textBoxCompressDays_Validating(object sender, CancelEventArgs e)
-        {
-            var textbox = sender as MetroTextBox;
-            var num = 1;
-            int.TryParse(Regex.Replace(textbox.Text, @"[^0-9]", ""), out num);
-            if (num <= 0)
-                num = 1;
-            textbox.Text = num.ToString();
-        }
-
         private void toggleCompression_CheckedChanged(object sender, EventArgs e)
         {
-            if (toggleCompression.Checked)
+            if (settingsUseCompress.Checked)
             {
                 if (!dayChangeDetector.Enabled)
                     dayChangeDetector.Start();
@@ -153,16 +192,6 @@ namespace VRCSSTweaks
             }
             else if (dayChangeDetector.Enabled)
                 dayChangeDetector.Stop();
-        }
-
-        private void textBoxBorderHour_Validating(object sender, CancelEventArgs e)
-        {
-            var textbox = sender as MetroTextBox;
-            var num = 1;
-            int.TryParse(Regex.Replace(textbox.Text, @"[^0-9]", ""), out num);
-            if (num <= 0)
-                num = 1;
-            textbox.Text = num.ToString();
         }
 
         private void toggleUseDarkMode_CheckedChanged(object sender, EventArgs e)

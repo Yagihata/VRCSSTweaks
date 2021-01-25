@@ -111,7 +111,7 @@ namespace VRCSSTweaks
                     panelScreenshotPreview.BackgroundImage.Dispose();
                 var file = CreateImage(path);
                 panelScreenshotPreview.BackgroundImage = file;
-                if (toggleDetectBarcode.Checked)
+                if (settingsDetectBarcode.Checked)
                 {
                     BarcodeReader reader = new BarcodeReader();
                     Result result = reader.Decode(file as Bitmap);

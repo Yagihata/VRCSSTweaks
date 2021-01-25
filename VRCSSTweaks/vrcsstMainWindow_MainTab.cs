@@ -35,14 +35,14 @@ namespace VRCSSTweaks
                 labelRecentlySSSize.Text = new FileSize(info).ToString();
                 var file = CreateImage(path);
                 panelNewScreenshot.BackgroundImage = file;
-                if (toggleDetectBarcode.Checked)
+                if (settingsDetectBarcode.Checked)
                 {
                     BarcodeReader reader = new BarcodeReader();
                     Result result = reader.Decode(file as Bitmap);
                     if (result != null)
                     {
                         textBoxRecentlySSURL.Text = result.Text;
-                        if (toggleOpenBarcode.Checked && IsUrl(result.Text) && openBarcode)
+                        if (settingsOpenBarcode.Checked && IsUrl(result.Text) && openBarcode)
                             Process.Start(result.Text);
                     }
                     else
