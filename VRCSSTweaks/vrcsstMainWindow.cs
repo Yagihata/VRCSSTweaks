@@ -898,40 +898,5 @@ namespace VRCSSTweaks
         {
             Application.Exit();
         }
-
-        private void settingsFolderLinkSrc_FilePathChanged(object sender, EventArgs e)
-        {
-
-        }
-
-        private void toggleCompression_CheckedChanged(object sender, EventArgs e)
-        {
-
-        }
-
-        private void toggleUseDarkMode_CheckedChanged(object sender, EventArgs e)
-        {
-
-        }
-
-        private void toggleStartup_CheckedChanged(object sender, EventArgs e)
-        {
-
-        }
-
-        private void toggleSortSS_CheckedChanged(object sender, EventArgs e)
-        {
-
-        }
-
-        private void toggleObserveSS_CheckedChanged(object sender, EventArgs e)
-        {
-
-        }
-
-        private void textBoxSSFolder_TextChanged(object sender, EventArgs e)
-        {
-
-        }
     }
 }
