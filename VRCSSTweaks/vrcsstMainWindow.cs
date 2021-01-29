@@ -558,7 +558,7 @@ namespace VRCSSTweaks
             settingsMinButtonMode.SelectedIndex = (int)GetConfigValue(vrcSSTSettings, "MinimizeMode", settingsMinButtonMode.SelectedIndex, typeof(int));
             settingsCloseButtonMode.SelectedIndex = (int)GetConfigValue(vrcSSTSettings, "CloseMode", settingsCloseButtonMode.SelectedIndex, typeof(int));
         }
-        private void LogOutput(string log)
+        public static void LogOutput(string log)
         {
             var date = DateTime.Now;
             var now = string.Format("{0}-{1}-{2}_{3}-{4}-{5}", date.Year, date.Month, date.Day, date.Hour, date.Minute, date.Second);
@@ -639,6 +639,8 @@ namespace VRCSSTweaks
                 var input = element.Element(key);
                 if (input != null)
                     return input.Value;
+                else
+                    return defaultValue;
             }
             else
             {
@@ -649,7 +651,11 @@ namespace VRCSSTweaks
                     if (input != null)
                         try
                         {
-                            return converter.ConvertFromString(input.Value);
+                            var returnVal = converter.ConvertFromString(input.Value);
+                            if (returnVal != null)
+                                return returnVal;
+                            else
+                                return defaultValue;
                         }
                         catch
                         {

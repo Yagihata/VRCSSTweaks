@@ -162,7 +162,8 @@ namespace VRCSSTweaks
 
         private void toggleObserveSS_CheckedChanged(object sender, EventArgs e)
         {
-            fileSystemWatcher.EnableRaisingEvents = settingsObserveSS.Checked;
+            if (finishInit)
+                fileSystemWatcher.EnableRaisingEvents = settingsObserveSS.Checked;
         }
 
         private void toggleSortSS_CheckedChanged(object sender, EventArgs e)
@@ -181,17 +182,20 @@ namespace VRCSSTweaks
 
         private void toggleCompression_CheckedChanged(object sender, EventArgs e)
         {
-            if (settingsUseCompress.Checked)
+            if(finishInit)
             {
-                if (!dayChangeDetector.Enabled)
-                    dayChangeDetector.Start();
-                if (finishInit && MessageBox.Show("既に存在するファイルを圧縮しますか？", "確認", MessageBoxButtons.YesNo) == DialogResult.Yes)
+                if (settingsUseCompress.Checked)
                 {
-                    CompressScrenshot();
+                    if (!dayChangeDetector.Enabled)
+                        dayChangeDetector.Start();
+                    if (finishInit && MessageBox.Show("既に存在するファイルを圧縮しますか？", "確認", MessageBoxButtons.YesNo) == DialogResult.Yes)
+                    {
+                        CompressScrenshot();
+                    }
                 }
+                else if (dayChangeDetector.Enabled)
+                    dayChangeDetector.Stop();
             }
-            else if (dayChangeDetector.Enabled)
-                dayChangeDetector.Stop();
         }
 
         private void toggleUseDarkMode_CheckedChanged(object sender, EventArgs e)
